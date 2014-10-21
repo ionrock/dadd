@@ -1,0 +1,5 @@
+cmd: venv/bin/python hello_server.py
+download_urls:
+  hello_server.py: http://localhost:5000/files/hello_server.py
+python_deps:
+  - flask
