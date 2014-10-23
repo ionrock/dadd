@@ -1,0 +1,2 @@
+master: venv/bin/dad-server --port $PORT
+worker: venv/bin/dad-worker --port $PORT

@@ -15,6 +15,8 @@ requirements = [
     'flask',
     'python-daemon',
     'click',
+    'flask-sqlalchemy',
+    'psycopg2',
 ]
 
 setup(
@@ -38,8 +40,9 @@ setup(
     keywords='dad',
     entry_points={
         'console_scripts': [
-            'dad-worker = dad.server:run',
-            'dad-runner = dad.proc:runner',
+            'dad-worker = dad.worker:run',
+            'dad-runner = dad.worker.proc:runner',
+            'dad-server = dad.master:run',
         ]
     },
     classifiers=[

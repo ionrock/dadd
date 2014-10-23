@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 import tempfile
+import signal
 
 from subprocess import Popen, call
 
@@ -41,7 +42,7 @@ class WorkerProcess(object):
         raise NotImplementedError()
 
     def download_files(self):
-        for filename, url in self.spec.get('download_urls').iteritems():
+        for filename, url in self.spec.get('download_urls', {}).iteritems():
             resp = self.sess.get(url, stream=True)
             resp.raise_for_status()
 
@@ -72,13 +73,22 @@ class PythonWorkerProcess(WorkerProcess):
 
         # Use the virtulaenv python
         if cmd[0].startswith('python'):
-            cmd[0] = 'venv/bin/' % cmd[0]
+            cmd[0] = 'venv/bin/%s' % cmd[0]
 
-        self.code = call(cmd)
+        print('Running: %s' % cmd)
+        self.proc = Popen(cmd)
+        self.proc.wait()
+
+    @property
+    def code(self):
+        return self.proc.returncode
+
+    def cleanup(self, *args):
+        print('Cleaning up: %s' % list(args))
+        self.proc.terminate()
 
 
 @click.command()
-# @click.argument('global_config', type=click.File())
 @click.argument('proc_config', type=click.File())
 def runner(proc_config):
     spec = json.load(proc_config)
@@ -91,17 +101,21 @@ def runner(proc_config):
 
     output_log = open(logfile, 'w+')
 
-    daemon_context = {
-        'stdout': output_log,
-        'stderr': output_log,
-        'working_directory': tempdir,
-    }
-
     # TODO: Only python is supported atm
     worker = PythonWorkerProcess(spec)
 
+    context = daemon.DaemonContext(
+        stdout=output_log,
+        stderr=output_log,
+        working_directory=tempdir,
+    )
+
+    context.signal_map.update({
+        signal.SIGTERM: worker.cleanup,
+    })
+
     # TODO: Redirect output and handle errors
-    with daemon.DaemonContext(**daemon_context):
+    with context:
         worker.setup()
         worker.start()
         if not worker.code:

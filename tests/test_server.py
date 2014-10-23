@@ -44,9 +44,9 @@ class TestStartHelloProc(object):
                         data=open(self.example_server))
         assert resp.ok
 
-    def upload_spec(self, sess):
+    def start_process(self, sess):
         spec = yaml.safe_load(open(self.example_spec))
-        resp = sess.post('http://localhost:5000/run/',
+        resp = sess.post('http://localhost:5000/api/procs/',
                          data=json.dumps(spec))
         assert resp.ok
 
@@ -59,7 +59,7 @@ class TestStartHelloProc(object):
 
     def test_run_hello_server(self, sess):
         self.put_file(sess)
-        self.upload_spec(sess)
+        self.start_process(sess)
 
         time.sleep(10)
 
