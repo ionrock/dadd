@@ -17,6 +17,7 @@ if os.environ.get('APP_SETTINGS_YAML'):
 
 
 import dad.master.server  # noqa
+import dad.master.api.procs  # noqa
 
 
 @click.command()

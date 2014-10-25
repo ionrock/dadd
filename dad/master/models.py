@@ -17,9 +17,13 @@ class Process(db.Model):
     pid = db.Column(db.Integer)
     spec = db.Column(JSON, nullable=False)
     host_id = db.Column(db.Integer, db.ForeignKey('hosts.id'))
-
     host = relationship('Host', backref=backref('procs'),
                         cascade='all, delete')
+
+    state = db.Column(db.Enum(
+        'init', 'setup', 'running', 'failed', 'success',
+        name='proc_state'
+    ))
 
 
 class Host(db.Model):
