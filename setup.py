@@ -46,9 +46,7 @@ setup(
     keywords='dad',
     entry_points={
         'console_scripts': [
-            'dad-worker = dad.worker:run',
-            'dad-runner = dad.worker.proc:runner',
-            'dad-server = dad.master:run',
+            'dad = dad.cli:run',
         ]
     },
     classifiers=[

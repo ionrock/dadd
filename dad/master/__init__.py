@@ -24,14 +24,6 @@ import dad.master.api.hosts  # noqa
 
 
 @click.command()
-@click.option('--host', '-H', default='127.0.0.1')
-@click.option('--port', '-p', default=5000)
-def run(host, port):
-    if host:
-        app.config['HOST'] = host
-
-    if port:
-        app.config['PORT'] = port
-
+def run():
     server.mount(app, '/')
     server.run(app.config)

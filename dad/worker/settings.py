@@ -1,6 +1,5 @@
 import os
 
-DEBUG = True
 PORT = os.environ.get('PORT', 6000)
-HOST = 'localhost'
-MASTER_URL = 'http://localhost:5000'
+HOST = '127.0.0.1'
+MASTER_URL = 'http://127.0.0.1:5000'
