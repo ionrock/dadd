@@ -28,9 +28,12 @@ def find_host():
         if num_procs >= procs:
             current_host = host
 
+    if not current_host:
+        raise Exception('No workers available!')
+
     # See if the host is up and running. If not let's delete it.
     try:
-        requests.get('http://%s/' % str(host))
+        requests.get('http://%s/' % str(current_host))
         return current_host
     except requests.exceptions.ConnectionError:
         db.session.delete(host)

@@ -4,4 +4,4 @@ requests
 pytest
 mock
 PyYAML
-gunicorn
+honcho

@@ -4,7 +4,7 @@ from flask import jsonify, request
 
 from dad.master import app
 from dad.master.utils import get_session, find_host
-from dad.master.models import db, Process
+from dad.master.models import db, Process, Logfile
 
 
 def set_proc_state(id, state):
@@ -18,6 +18,21 @@ def set_proc_state(id, state):
 def proc_state_init(id, state):
     set_proc_state(id, state)
     return jsonify({'status': state})
+
+
+@app.route('/api/procs/<id>/logfile/', methods=['GET', 'POST'])
+def proc_logfile(id):
+    proc = Process.query.get(id)
+    if request.method == 'GET':
+        if proc.logfile:
+            return proc.logfile.content
+        return 'No logfile found', 404
+
+    logfile = Logfile(content=request.content)
+    proc.logfile = logfile
+    db.add(logfile)
+    db.add(proc)
+    db.commit()
 
 
 # Start an app
@@ -37,7 +52,8 @@ def proc_create():
 
     result = resp.json()
     proc = Process(pid=result['pid'],
-                   spec=doc, host=host)
+                   spec=doc,
+                   host=host)
     db.session.add(proc)
     db.session.commit()
     return jsonify({'created': proc.id})

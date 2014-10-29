@@ -1,13 +1,7 @@
-from flask import send_file, request, jsonify
+from flask import jsonify, request
 
 from dad.master import app
-from dad.master.files import FileStorage
 from dad.master.models import db, Host
-
-
-@app.route('/')
-def index():
-    return 'the homepage'
 
 
 # Host Registration
@@ -29,16 +23,3 @@ def api_view_hosts():
     return jsonify({
         'hosts': [str(host) for host in hosts]
     })
-
-
-@app.route('/files/<path>', methods=['PUT', 'GET'])
-def files(path):
-    storage = FileStorage(app.config['STORAGE_DIR'])
-
-    if request.method == 'PUT':
-        storage.save(path, request.stream)
-        resp = app.make_response('Updated %s' % path)
-        resp.status_code = 202
-        return resp
-
-    return send_file(storage.read(path))

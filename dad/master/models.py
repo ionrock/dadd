@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from dad.master import app
 
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -20,6 +22,11 @@ class Process(db.Model):
     host = relationship('Host', backref=backref('procs'),
                         cascade='all, delete')
 
+    logfile = db.ForeignKey('Logfile', cascade='all, delete')
+
+    start_time = db.Column(db.DateTime, default=datetime.now)
+    end_time = db.Column(db.DateTime)
+
     state = db.Column(db.Enum(
         'init', 'setup', 'running', 'failed', 'success',
         name='proc_state'
@@ -38,3 +45,10 @@ class Host(db.Model):
 
     def __str__(self):
         return '%s:%s' % (self.host, self.port)
+
+
+class Logfile(db.Model):
+    __tableanme__ = 'logfiles'
+
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text)

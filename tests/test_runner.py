@@ -3,9 +3,6 @@ import os
 from mock import Mock, patch, ANY
 from click.testing import CliRunner
 
-from dad.worker.proc import PythonWorkerProcess
-from dad.worker.proc import ChildProcess
-from dad.worker.proc import runner
 from dad.worker import proc
 
 
@@ -16,10 +13,10 @@ class TestChildProcess(object):
         spec = {
             'cmd': 'ls -la',
         }
-        proc = ChildProcess(spec)
-        proc.run('--foreground True --cleanup-working-dir')
+        process = proc.ChildProcess(spec)
+        process.run('--foreground True --cleanup-working-dir')
 
-        info = proc.info()
+        info = process.info()
 
         Popen.assert_called_with([
             'dad-runner', info['spec'],
@@ -45,7 +42,7 @@ class TestRunner(object):
             self.spec, self.here, 'output.log'
         )
 
-        result = self.cli.invoke(runner, [self.spec])
+        result = self.cli.invoke(proc.runner, [self.spec])
 
         assert 'Created Working Directory' in result.output
         assert 'Logging to:' in result.output
@@ -58,12 +55,12 @@ class TestRunner(object):
 
     @patch('dad.worker.proc.daemon')
     def test_run_in_forground(self, daemon):
-        result = self.cli.invoke(runner, [self.spec, '--foreground'])
+        result = self.cli.invoke(proc.runner, [self.spec, '--foreground'])
         assert 'Running in the foreground' in result.output
 
     @patch('dad.worker.proc.daemon')
     def test_clean_up_working_dir(self, daemon):
-        result = self.cli.invoke(runner, [self.spec, '--cleanup-working-dir'])
+        result = self.cli.invoke(proc.runner, [self.spec, '--cleanup-working-dir'])
 
         cleaned = False
         for line in result.output.split('\n'):
@@ -90,3 +87,10 @@ class TestPythonWorkerProcess(object):
         self.proc.setup()
         assert self.proc.install_python_deps.called
         assert self.proc.download_files.called
+
+    @patch('dad.worker.proc.Popen')
+    def test_run_successfully(self, Popen):
+        self.proc.start()
+
+        Popen.assert_called_with(['ls', '-la'])
+        assert self.proc.proc.wait.called

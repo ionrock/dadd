@@ -4,9 +4,11 @@ import json
 import shutil
 import tempfile
 import signal
+import shlex
 
 from subprocess import Popen, call
 from collections import namedtuple
+from contextlib import contextmanager
 
 import click
 import daemon
@@ -109,8 +111,7 @@ class PythonWorkerProcess(WorkerProcess):
         self.download_files()
 
     def start(self):
-        # TODO: Use shlex
-        cmd = self.spec['cmd'].split()
+        cmd = shlex.split(self.spec['cmd'])
 
         # Use the virtulaenv python
         if cmd[0].startswith('python'):
@@ -130,6 +131,36 @@ class PythonWorkerProcess(WorkerProcess):
 
     def finish(self):
         print('notifying master...')
+
+
+class ErrorHandler(object):
+    def __init__(self, spec, logfile):
+        self.spec = spec
+        self.sess = requests.Session()
+
+    def procs_url(self, tail):
+        base = app.config['MASTER_URL']
+        return '%s/api/procs/%s/%s' % (base, self.spec.get('process_id'), tail)
+
+    def upload_log(self):
+        if hasattr(self.stdout, 'name'):
+            logfile = open(self.stdout.name, 'r')
+            url = self.procs_url('logfile/')
+            headers = {'content-type': 'text/plain'}
+            self.sess.post(url, headers=headers, data=logfile)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        try:
+            if not exc_type:
+                self.sess.post(self.procs_url('success/'))
+            else:
+                self.upload_log()
+                self.sess.post(self.procs_url('failed/'))
+        except requests.exceptions.ConnectionError:
+            pass
 
 
 @click.command()
@@ -183,9 +214,11 @@ def runner(specfile, cleanup_working_dir, foreground, working_dir=None):
     })
 
     with context:
-        worker.setup()
-        worker.start()
-        worker.finish()
+        with ErrorHandler(spec, logfile_name):
+            worker.setup()
+            worker.start()
+            worker.finish()
+
         if cleanup_working_dir:
             click.echo('Cleaning up the working directory: %s' % working_dir)
             shutil.rmtree(working_dir)

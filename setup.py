@@ -17,6 +17,12 @@ requirements = [
     'click',
     'flask-sqlalchemy',
     'psycopg2',
+    # I'd like to use these packages, but they don't seem to be
+    # updated vs. core cherrypy.
+    #
+    # 'cheroot',
+    # 'magicbus',
+    'cherrypy',
 ]
 
 setup(
