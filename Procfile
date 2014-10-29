@@ -1,2 +1,2 @@
-master: gunicorn -n dad-master -c gunicorn_config.py dad.master:app
-worker: gunicorn -n dad-worker -c gunicorn_config.py dad.worker:app
+master: PYTHONUNBUFFERED=true venv/bin/dad-server --port $PORT
+worker: PYTHONUNBUFFERED=true venv/bin/dad-worker --port $PORT
