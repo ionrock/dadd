@@ -20,7 +20,7 @@ class TestChildProcess(object):
 
         Popen.assert_called_with([
             'dad', 'run', info['spec'],
-            '--working-directory', info['directory'],
+            '--working-dir', info['directory'],
             '--cleanup-working-dir',
             '--foreground'
         ])

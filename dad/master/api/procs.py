@@ -38,8 +38,7 @@ def proc_state_init(id, state):
 def proc_logfile(id):
     proc = Process.query.get(id)
     if request.method == 'GET':
-        if proc.logfile:
-            print(dir(proc.logfile))
+        if proc.logfile_id:
             return make_response(proc.logfile.content)
         return 'No logfile found', 404
 

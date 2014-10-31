@@ -23,8 +23,7 @@ class Process(db.Model):
                         cascade='all, delete')
 
     logfile_id = db.Column(db.Integer, db.ForeignKey('logfiles.id'))
-    logfile = db.ForeignKey('Logfile', backref=backref('process'),
-                            cascade='all, delete')
+    logfile = relationship('Logfile', backref=backref('process'))
 
     start_time = db.Column(db.DateTime, default=datetime.now)
     end_time = db.Column(db.DateTime)
@@ -54,6 +53,3 @@ class Logfile(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text)
-
-    def __str__(self):
-        return self.content
