@@ -8,11 +8,12 @@ import shlex
 
 from subprocess import Popen, call
 from collections import namedtuple
-from contextlib import contextmanager
 
 import click
 import daemon
 import requests
+
+from erroremail import ErrorEmail
 
 from dad.worker import app
 
@@ -45,8 +46,8 @@ class ChildProcess(object):
         env = create_env(self.spec)
 
         cmd = [
-            'dad-runner', env.spec,
-            '--working-directory', env.directory,
+            'dad', 'run', env.spec,
+            '--working-dir', env.directory,
             '--cleanup-working-dir'
         ]
 
@@ -136,6 +137,7 @@ class PythonWorkerProcess(WorkerProcess):
 class ErrorHandler(object):
     def __init__(self, spec, logfile):
         self.spec = spec
+        self.logfile = logfile
         self.sess = requests.Session()
 
     def procs_url(self, tail):
@@ -143,24 +145,38 @@ class ErrorHandler(object):
         return '%s/api/procs/%s/%s' % (base, self.spec.get('process_id'), tail)
 
     def upload_log(self):
-        if hasattr(self.stdout, 'name'):
-            logfile = open(self.stdout.name, 'r')
+        if 'process_id' in self.spec:
+            logfile = open(self.logfile, 'r')
             url = self.procs_url('logfile/')
             headers = {'content-type': 'text/plain'}
             self.sess.post(url, headers=headers, data=logfile)
 
+    def set_process_state(self, state):
+        if 'process_id' in self.spec:
+            try:
+                self.sess.post(self.procs_url('%s/' % state))
+            except requests.exceptions.ConnectionError:
+                # TODO: Display a warning.
+                pass
+
+    def send_error_email(self, *args):
+        if 'ERROR_EMAIL_CONFIG' in app.config:
+            mailer = ErrorEmail(app.config['ERROR_EMAIL_CONFIG'])
+            message = mailer.create_message_from_traceback(args)
+            mailer.send_email(message)
+
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        try:
-            if not exc_type:
-                self.sess.post(self.procs_url('success/'))
-            else:
-                self.upload_log()
-                self.sess.post(self.procs_url('failed/'))
-        except requests.exceptions.ConnectionError:
-            pass
+    def __exit__(self, *args):
+        if None in args:
+            self.set_process_state('success')
+            return True
+
+        self.upload_log()
+        self.set_process_state('failed')
+        self.send_error_email(*args)
+        return True
 
 
 @click.command()

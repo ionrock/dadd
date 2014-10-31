@@ -19,7 +19,7 @@ class TestChildProcess(object):
         info = process.info()
 
         Popen.assert_called_with([
-            'dad-runner', info['spec'],
+            'dad', 'run', info['spec'],
             '--working-directory', info['directory'],
             '--cleanup-working-dir',
             '--foreground'

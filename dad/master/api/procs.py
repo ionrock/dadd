@@ -1,6 +1,6 @@
 import json
 
-from flask import jsonify, request
+from flask import jsonify, request, make_response
 
 from dad.master import app
 from dad.master.utils import get_session, find_host
@@ -14,6 +14,20 @@ def set_proc_state(id, state):
     db.session.commit()
 
 
+@app.route('/api/procs/<id>/', methods=['GET'])
+def proc_view(id):
+    proc = Process.query.get(id)
+
+    return jsonify({
+        'id': proc.id,
+        'host': {
+            'uri': 'http://%s' % str(proc.host)
+        },
+        'spec': proc.spec,
+        'state': proc.state,
+    })
+
+
 @app.route('/api/procs/<id>/<state>/', methods=['POST'])
 def proc_state_init(id, state):
     set_proc_state(id, state)
@@ -25,14 +39,18 @@ def proc_logfile(id):
     proc = Process.query.get(id)
     if request.method == 'GET':
         if proc.logfile:
-            return proc.logfile.content
+            print(dir(proc.logfile))
+            return make_response(proc.logfile.content)
         return 'No logfile found', 404
 
-    logfile = Logfile(content=request.content)
+    app.logger.info(request.data)
+
+    logfile = Logfile(content=request.data)
     proc.logfile = logfile
-    db.add(logfile)
-    db.add(proc)
-    db.commit()
+    db.session.add(logfile)
+    db.session.add(proc)
+    db.session.commit()
+    return jsonify({'message': 'added logfile'})
 
 
 # Start an app
@@ -43,6 +61,14 @@ def proc_create():
     # Find a host
     host = find_host()
 
+    # Create our process in the DB
+    proc = Process(spec=doc, host=host)
+    db.session.add(proc)
+    db.session.commit()
+
+    # Add the ID to the spec
+    doc['process_id'] = proc.id
+
     # Try creating the process via the host
     url = 'http://%s/run/' % str(host)
     sess = get_session()
@@ -50,10 +76,10 @@ def proc_create():
     resp = sess.post(url, data=json.dumps(doc))
     resp.raise_for_status()
 
+    # Save the pid
     result = resp.json()
-    proc = Process(pid=result['pid'],
-                   spec=doc,
-                   host=host)
+    proc.pid = result['pid']
     db.session.add(proc)
     db.session.commit()
+
     return jsonify({'created': proc.id})

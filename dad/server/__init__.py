@@ -34,7 +34,3 @@ def run(config):
 def monitor(name, func, interval):
     monitor = Heartbeat(cherrypy.engine, func, interval, name)
     monitor.subscribe()
-
-    # Probably don't need this as we shouldn't need to access
-    # individual plugins, but it can't hurt.
-    setattr(cherrypy.engine, 'name', monitor)

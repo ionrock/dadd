@@ -1,7 +1,0 @@
--e .
-
-requests
-pytest
-mock
-PyYAML
-honcho
