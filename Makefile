@@ -14,9 +14,11 @@ help:
 	@echo "test-all - run tests on every Python version with tox"
 	@echo "coverage - check code coverage quickly with the default Python"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
-	@echo "release - package and upload a release. use `-e CHEESE=http://localpypi` to release somewhere else."
+	@echo "release - package and upload a release."
+	@echo '          use `-e CHEESE=http://localpypi` to release somewhere else.'
 	@echo "dist - package"
-	@echo "bump - bump the version number via bumpversion. use `-e BUMPTYPE=minor` to specify `major` or `minor` (default is `patch`)."
+	@echo "bump - bump the version number via bumpversion."
+	@echo '       use `-e BUMPTYPE=minor` to specify `major` or `minor` (default is `patch`).'
 
 bootstrap:
 	virtualenv $(VENV)
