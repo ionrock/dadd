@@ -7,3 +7,4 @@ PyYAML
 honcho
 portend
 webtest
+bumpversion
