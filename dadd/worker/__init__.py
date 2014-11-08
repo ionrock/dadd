@@ -6,13 +6,13 @@ import click
 
 from flask import Flask
 
-from dad import server
+from dadd import server
 
 app = Flask(__name__)
-app.config.from_object('dad.worker.settings')
+app.config.from_object('dadd.worker.settings')
 
 
-import dad.worker.handlers  # noqa
+import dadd.worker.handlers  # noqa
 
 
 @click.command()
@@ -20,10 +20,10 @@ def run():
     if os.environ['DEBUG']:
         app.debug = True
 
-    register = partial(dad.worker.handlers.register,
+    register = partial(dadd.worker.handlers.register,
                        app.config['HOST'],
                        app.config['PORT'])
 
-    server.monitor('Dad_Heartbeat', register, 2)
+    server.monitor('Dadd_Heartbeat', register, 2)
     server.mount(app, '/')
     server.run(app.config)

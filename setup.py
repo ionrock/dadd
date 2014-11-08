@@ -21,27 +21,27 @@ requirements = [
 ]
 
 setup(
-    name='dad',
+    name='dadd',
     version='0.1.1',
-    description=('Dad is a remote worker hosts for '
+    description=('Dadd is a remote worker hosts for '
                  'starting and forgetting processes.'),
     long_description=readme + '\n\n' + history,
     author='Eric Larson',
     author_email='eric@ionrock.org',
-    url='https://github.com/ionrock/dad',
+    url='https://github.com/ionrock/dadd',
     packages=[
-        'dad',
+        'dadd',
     ],
-    package_dir={'dad':
-                 'dad'},
+    package_dir={'dadd':
+                 'dadd'},
     include_package_data=True,
     install_requires=requirements,
     license="BSD",
     zip_safe=False,
-    keywords='dad',
+    keywords='dadd',
     entry_points={
         'console_scripts': [
-            'dad = dad.cli:run',
+            'dadd = dadd.cli:run',
         ]
     },
     classifiers=[

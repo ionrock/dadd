@@ -3,12 +3,12 @@ import os
 from mock import Mock, patch, ANY
 from click.testing import CliRunner
 
-from dad.worker import proc
+from dadd.worker import proc
 
 
 class TestChildProcess(object):
 
-    @patch('dad.worker.proc.Popen')
+    @patch('dadd.worker.proc.Popen')
     def test_run_dumps_spec(self, Popen):
         spec = {
             'cmd': 'ls -la',
@@ -19,7 +19,7 @@ class TestChildProcess(object):
         info = process.info()
 
         Popen.assert_called_with([
-            'dad', 'run', info['spec'],
+            'dadd', 'run', info['spec'],
             '--working-dir', info['directory'],
             '--cleanup-working-dir',
             '--foreground'
@@ -35,8 +35,8 @@ class TestRunner(object):
         self.spec = os.path.join(self.here, 'lsspec.json')
         self.cli = CliRunner()
 
-    @patch('dad.worker.proc.daemon')
-    @patch('dad.worker.proc.create_env')
+    @patch('dadd.worker.proc.daemon')
+    @patch('dadd.worker.proc.create_env')
     def test_only_pass_in_spec(self, create_env, daemon):
         create_env.return_value = proc.ProcessEnv(
             self.spec, self.here, 'output.log'
@@ -53,12 +53,12 @@ class TestRunner(object):
             working_directory=self.here,
         )
 
-    @patch('dad.worker.proc.daemon')
+    @patch('dadd.worker.proc.daemon')
     def test_run_in_forground(self, daemon):
         result = self.cli.invoke(proc.runner, [self.spec, '--foreground'])
         assert 'Running in the foreground' in result.output
 
-    @patch('dad.worker.proc.daemon')
+    @patch('dadd.worker.proc.daemon')
     def test_clean_up_working_dir(self, daemon):
         result = self.cli.invoke(proc.runner, [self.spec, '--cleanup-working-dir'])
 
@@ -88,7 +88,7 @@ class TestPythonWorkerProcess(object):
         assert self.proc.install_python_deps.called
         assert self.proc.download_files.called
 
-    @patch('dad.worker.proc.Popen')
+    @patch('dadd.worker.proc.Popen')
     def test_run_successfully(self, Popen):
         self.proc.start()
 

@@ -43,7 +43,7 @@ clean-test:
 	rm -fr htmlcov/
 
 lint:
-	flake8 dad tests
+	flake8 dadd.tests
 
 test:
 	$(VENV)/bin/py.test
@@ -52,13 +52,13 @@ test-all:
 	tox
 
 coverage:
-	coverage run --source dad setup.py test
+	coverage run --source dadd.setup.py test
 	coverage report -m
 	coverage html
 	open htmlcov/index.html
 
 docs:
-	rm -f docs/dad.rst
+	rm -f docs/dadd.rst
 	rm -f docs/modules.rst
 	sphinx-apidoc -o docs/ dad
 	$(MAKE) -C docs clean

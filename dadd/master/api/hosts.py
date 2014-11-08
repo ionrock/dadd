@@ -1,7 +1,7 @@
 from flask import jsonify, request, url_for
 
-from dad.master import app
-from dad.master.models import db, Host
+from dadd.master import app
+from dadd.master.models import db, Host
 
 
 # Host Registration

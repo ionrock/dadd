@@ -5,16 +5,16 @@ import yaml
 
 from flask import Flask
 
-from dad import server
+from dadd import server
 
 # Set up the app object before importing the handlers to avoid a
 # circular import
 app = Flask(__name__)
-app.config.from_object('dad.master.settings')
+app.config.from_object('dadd.master.settings')
 
-import dad.master.handlers  # noqa
-import dad.master.api.procs  # noqa
-import dad.master.api.hosts  # noqa
+import dadd.master.handlers  # noqa
+import dadd.master.api.procs  # noqa
+import dadd.master.api.hosts  # noqa
 
 
 @click.command()

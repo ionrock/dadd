@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from dad.master import app
+from dadd.master import app
 
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import JSON

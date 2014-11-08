@@ -1,7 +1,7 @@
 from flask import send_file, request, redirect, url_for
 
-from dad.master import app
-from dad.master.files import FileStorage
+from dadd.master import app
+from dadd.master.files import FileStorage
 
 
 @app.route('/')

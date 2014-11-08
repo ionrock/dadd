@@ -2,7 +2,7 @@ import os
 
 from subprocess import call
 
-from dad.master.models import db
+from dadd.master.models import db
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))

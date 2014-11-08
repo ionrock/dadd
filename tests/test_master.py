@@ -4,8 +4,8 @@ import random
 
 import yaml
 
-from dad.master import app
-from dad.master.models import Process, Host, db
+from dadd.master import app
+from dadd.master.models import Process, Host, db
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 

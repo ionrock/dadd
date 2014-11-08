@@ -15,7 +15,7 @@ import requests
 
 from erroremail import ErrorEmail
 
-from dad.worker import app
+from dadd.worker import app
 
 
 ProcessEnv = namedtuple('ProcessEnv', [
@@ -46,7 +46,7 @@ class ChildProcess(object):
         env = create_env(self.spec)
 
         cmd = [
-            'dad', 'run', env.spec,
+            'dadd', 'run', env.spec,
             '--working-dir', env.directory,
             '--cleanup-working-dir'
         ]

@@ -4,8 +4,8 @@ import requests
 
 from flask import request, jsonify
 
-from dad.worker import app
-from dad.worker.proc import ChildProcess
+from dadd.worker import app
+from dadd.worker.proc import ChildProcess
 
 
 @app.route('/run/', methods=['POST'])

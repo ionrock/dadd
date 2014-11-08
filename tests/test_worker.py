@@ -1,7 +1,7 @@
 import os
 import json
 
-from dad.worker import app
+from dadd.worker import app
 
 
 class TestStartProc(object):

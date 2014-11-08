@@ -1,6 +1,6 @@
 import requests
 
-from dad.master.models import db, Host
+from dadd.master.models import db, Host
 
 
 def get_session():

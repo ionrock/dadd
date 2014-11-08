@@ -2,9 +2,9 @@ import json
 
 from flask import jsonify, request, make_response
 
-from dad.master import app
-from dad.master.utils import get_session, find_host
-from dad.master.models import db, Process, Logfile
+from dadd.master import app
+from dadd.master.utils import get_session, find_host
+from dadd.master.models import db, Process, Logfile
 
 
 def set_proc_state(id, state):

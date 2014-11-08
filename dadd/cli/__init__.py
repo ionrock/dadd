@@ -3,9 +3,9 @@ import os
 import click
 import yaml
 
-from dad.master import run as run_master
-from dad.worker import run as run_worker
-from dad.worker.proc import runner
+from dadd.master import run as run_master
+from dadd.worker import run as run_worker
+from dadd.worker.proc import runner
 
 
 @click.group()
