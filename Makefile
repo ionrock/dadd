@@ -67,3 +67,6 @@ dist: clean
 	python setup.py sdist
 	python setup.py bdist_wheel
 	ls -l dist
+
+run:
+	$(VENV)/bin/honcho start -f Procfile.dev
