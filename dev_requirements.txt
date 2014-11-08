@@ -1,0 +1,9 @@
+-e .
+
+requests
+pytest
+mock
+PyYAML
+honcho
+portend
+webtest
