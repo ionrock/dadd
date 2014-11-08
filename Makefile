@@ -44,7 +44,7 @@ lint:
 	flake8 dad tests
 
 test:
-	${VENV}/py.test
+	$(VENV)/bin/py.test
 
 test-all:
 	tox
