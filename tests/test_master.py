@@ -1,5 +1,6 @@
 import os
 import json
+import random
 
 import yaml
 
@@ -59,12 +60,13 @@ class TestMasterProcAPI(object):
         db.session.commit()
         self.app = app.test_client()
 
-    def add_proc(self):
+    def add_proc(self, host=None, port=9010):
         """Add a proc in the DB"""
-        host = Host(host='myhost', port='9010')
+
+        host = Host(host=host or 'myhost', port=port or '9010')
         proc = Process(spec={'cmd': 'ls'},
                        host=host,
-                       pid='29')
+                       pid=random.randint(10, 50))
 
         db.session.add(host)
         db.session.add(proc)
@@ -93,6 +95,20 @@ class TestMasterProcAPI(object):
         resp = self.app.get('/api/procs/%s/logfile/' % proc_id)
         assert 'hello' in resp.data
         assert 'world' in resp.data
+
+    def test_proc_listing(self):
+        # add some proces
+        self.add_proc('a', '9000')
+        self.add_proc('b', '9000')
+        self.add_proc('c', '9000')
+
+        resp = self.app.get('/api/procs/')
+        assert resp.status_code == 200
+
+        doc = json.loads(resp.data)
+        assert len(doc['procs']) == 3
+        assert 'next' in doc
+        assert 'prev' in doc
 
 
 class TestFileServing(object):

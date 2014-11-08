@@ -82,3 +82,17 @@ def proc_create():
     db.session.commit()
 
     return jsonify({'created': proc.id})
+
+
+@app.route('/api/procs/', methods=['GET'])
+def proc_list():
+    procs = Process.query.all()
+    doc = {
+        'procs': [],
+        'next': None,
+        'prev': None,
+    }
+    for proc in procs:
+        doc['procs'].append(proc.as_dict())
+
+    return jsonify(doc)

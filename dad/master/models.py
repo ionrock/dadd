@@ -33,6 +33,20 @@ class Process(db.Model):
         name='proc_state'
     ))
 
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'pid': self.pid,
+            'spec': self.spec,
+            'host': self.host.as_dict(),
+            # TODO: Use flask url generation
+            'logfile': '/api/procs/%s/logfile/' % self.id,
+            'start_time': self.start_time,
+            'end_time': self.end_time,
+            'state': self.state,
+            'update_state_uri': '/api/procs/%s/<state>/' % self.id
+        }
+
 
 class Host(db.Model):
     __tablename__ = 'hosts'
@@ -46,6 +60,13 @@ class Host(db.Model):
 
     def __str__(self):
         return '%s:%s' % (self.host, self.port)
+
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'host': self.host,
+            'port': self.port
+        }
 
 
 class Logfile(db.Model):
