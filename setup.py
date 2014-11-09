@@ -18,6 +18,7 @@ requirements = [
     'flask-sqlalchemy',
     'psycopg2',
     'cherrypy',
+    'erroremail',
 ]
 
 setup(
