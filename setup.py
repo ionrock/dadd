@@ -23,7 +23,7 @@ requirements = [
 
 setup(
     name='dadd',
-    version='0.1.2',
+    version='0.1.3',
     description=('Dadd is a remote worker hosts for '
                  'starting and forgetting processes.'),
     long_description=readme + '\n\n' + history,
