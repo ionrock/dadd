@@ -1,2 +1,2 @@
-master: dadd master --port $PORT
-worker: dadd worker --port $PORT
+master: dadd  --port $PORT master
+worker: dadd  --port $PORT worker
