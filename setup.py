@@ -19,6 +19,7 @@ requirements = [
     'psycopg2',
     'cherrypy',
     'erroremail',
+    'pyyaml',
 ]
 
 setup(
