@@ -1,2 +1,2 @@
-master: PYTHONUNBUFFERED=true venv/bin/dad --debug master
-worker: PYTHONUNBUFFERED=true venv/bin/dad --debug worker
+master: PYTHONUNBUFFERED=true venv/bin/dadd --debug master
+worker: PYTHONUNBUFFERED=true venv/bin/dadd --debug worker
