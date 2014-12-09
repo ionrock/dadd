@@ -1,2 +1,2 @@
-master: PYTHONUNBUFFERED=true venv/bin/dad master --port $PORT
-worker: PYTHONUNBUFFERED=true venv/bin/dad worker --port $PORT
+master: dadd master --port $PORT
+worker: dadd worker --port $PORT
