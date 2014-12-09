@@ -20,6 +20,7 @@ requirements = [
     'cherrypy',
     'erroremail',
     'pyyaml',
+    'requests',
 ]
 
 setup(
