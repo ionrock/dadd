@@ -1,11 +1,12 @@
 import os
 
-import click
 import yaml
+import click
 
 from flask import Flask
 
 from dadd import server
+
 
 # Set up the app object before importing the handlers to avoid a
 # circular import
@@ -17,8 +18,12 @@ import dadd.master.api.procs  # noqa
 import dadd.master.api.hosts  # noqa
 
 
-@click.command()
-def run():
+@click.command(name='master')
+@click.pass_context
+def run(ctx):
+    if ctx.obj:
+        app.config.update(ctx.obj)
+
     if 'DEBUG' in os.environ:
         app.debug = True
 

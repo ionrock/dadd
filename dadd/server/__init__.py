@@ -11,13 +11,19 @@ class Heartbeat(Monitor):
 
 
 def transform_config(config):
-    """Take a flask config and update with the necessary
-    cherrypy/cheroot equivalents."""
+    """Take a flask config items to create a cherrypy/cheroot server
+    config."""
 
-    config['server.socket_host'] = str(config.get('HOST', '0.0.0.0'))
-    config['server.socket_port'] = int(config.get('PORT', 5000))
+    cp_conf = {
+        'server.socket_host': str(config.get('HOST', '0.0.0.0')),
+        'server.socket_port': int(config.get('PORT', 5000)),
+    }
 
-    return config
+    if not config.get('DEBUG'):
+        # Turn off any debugging settings
+        cp_conf['engine.autoreload.on'] = False
+
+    return cp_conf
 
 
 def mount(app, path):
@@ -25,7 +31,8 @@ def mount(app, path):
 
 
 def run(config):
-    cherrypy.config.update(transform_config(config))
+    config = transform_config(config)
+    cherrypy.config.update(config)
     cherrypy.engine.signals.subscribe()
     cherrypy.engine.start()
     cherrypy.engine.block()

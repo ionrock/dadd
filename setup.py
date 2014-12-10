@@ -44,7 +44,7 @@ setup(
     keywords='dadd',
     entry_points={
         'console_scripts': [
-            'dadd = dadd.cli:run',
+            'dadd = dadd.cli:main',
         ]
     },
     classifiers=[

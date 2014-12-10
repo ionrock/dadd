@@ -16,9 +16,13 @@ import dadd.worker.handlers  # noqa
 
 
 @click.command()
-def run():
-    if os.environ['DEBUG']:
+@click.pass_context
+def run(ctx):
+    if os.environ.get('DEBUG') or (ctx.obj and ctx.obj.get('DEBUG')):
         app.debug = True
+
+    if ctx.obj:
+        app.config.update(ctx.obj)
 
     register = partial(dadd.worker.handlers.register,
                        app.config['HOST'],
