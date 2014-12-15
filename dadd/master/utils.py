@@ -33,8 +33,9 @@ def find_host():
 
     # See if the host is up and running. If not let's delete it.
     try:
-        requests.get('http://%s/' % str(current_host))
+        requests.get('http://%s/up/' % str(current_host))
         return current_host
     except requests.exceptions.ConnectionError:
         db.session.delete(host)
+        db.session.commit()
         return find_host()
