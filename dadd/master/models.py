@@ -38,7 +38,7 @@ class Process(db.Model):
             'id': self.id,
             'pid': self.pid,
             'spec': self.spec,
-            'host': self.host.as_dict(),
+            'host': self.host.as_dict() if self.host else '',
             # TODO: Use flask url generation
             'logfile': '/api/procs/%s/logfile/' % self.id,
             'start_time': self.start_time,
