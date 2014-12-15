@@ -97,14 +97,21 @@ class PythonWorkerProcess(WorkerProcess):
     def install_python_deps(self):
         self.create_virtualenv()
 
+        # Make sure we have a list
+        if isinstance(self.spec['python_deps'], basestring):
+            self.spec['python_deps'] = [self.spec['python_deps']]
+
         for dep in self.spec['python_deps']:
             cmd = [
-                'venv/bin/pip', 'install', dep
+                'venv/bin/pip', 'install',
             ]
 
-            if app.config.get('PYTHON_WORKER_CHEESESHOP'):
-                cmd.append('-i %s' % app.config['PYTHON_WORKER_CHEESESHOP'])
-            call()
+            if self.spec.get('python_cheeseshop'):
+                cmd.extend(['-i', self.spec['python_cheeseshop']])
+
+            cmd.append(dep)
+            print('Running: %s' % ' '.join(cmd))
+            call(cmd)
 
     def setup(self):
         if 'python_deps' in self.spec:
@@ -185,7 +192,6 @@ class ErrorHandler(object):
 @click.option('--foreground', is_flag=True)
 @click.option('--working-dir', '-w')
 def runner(specfile, cleanup_working_dir, foreground, working_dir=None):
-
     # Load our spec file
     spec = json.load(specfile)
     click.echo('Got config: %s' % spec)
@@ -230,9 +236,15 @@ def runner(specfile, cleanup_working_dir, foreground, working_dir=None):
     })
 
     with context:
+        # Add our spec as an APP_SETTINGS_JSON now that we are daemonized.
+        os.environ['APP_SETTINGS_JSON'] = specfile.name
+
         with ErrorHandler(spec, logfile_name):
+            print('Setting up')
             worker.setup()
+            print('Starting')
             worker.start()
+            print('Finishing')
             worker.finish()
 
         if cleanup_working_dir:
