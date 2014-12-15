@@ -1,5 +1,3 @@
-import os
-
 import click
 
 from dadd.master import run as run_master
