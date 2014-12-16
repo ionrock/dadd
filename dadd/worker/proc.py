@@ -77,7 +77,20 @@ class WorkerProcess(object):
         self.download_files()
 
     def start(self):
-        raise NotImplementedError()
+        if isinstance(self.spec['cmd'], basestring):
+            parts = shlex.split(self.spec['cmd'])
+        else:
+            parts = self.spec['cmd']
+
+        cmd = []
+        for part in parts:
+            if part == '$APP_SETTINGS':
+                part = os.environ['APP_SETTINGS_JSON']
+            cmd.append(part)
+
+        print('Running: %s' % ' '.join(cmd))
+        self.proc = Popen(cmd)
+        self.proc.wait()
 
     def download_files(self):
         for filename, url in self.spec.get('download_urls', {}).iteritems():
@@ -119,15 +132,9 @@ class PythonWorkerProcess(WorkerProcess):
         self.download_files()
 
     def start(self):
-        cmd = shlex.split(self.spec['cmd'])
-
-        # Use the virtulaenv python
-        if cmd[0].startswith('python'):
-            cmd[0] = 'venv/bin/%s' % cmd[0]
-
-        print('Running: %s' % cmd)
-        self.proc = Popen(cmd)
-        self.proc.wait()
+        # Add our virtualenv to the path
+        os.environ['PATH'] += ';%s' % os.path.abspath('./venv/bin/')
+        super(PythonWorkerProcess, self).start()
 
     @property
     def code(self):
