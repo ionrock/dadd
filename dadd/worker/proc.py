@@ -195,13 +195,12 @@ class ErrorHandler(object):
 
 @click.command()
 @click.argument('specfile', type=click.File())
-@click.option('--cleanup-working-dir', is_flag=True)
+@click.option('--no-cleanup', is_flag=True)
 @click.option('--foreground', is_flag=True)
 @click.option('--working-dir', '-w')
-def runner(specfile, cleanup_working_dir, foreground, working_dir=None):
+def runner(specfile, no_cleanup, foreground, working_dir=None):
     # Load our spec file
     spec = json.load(specfile)
-    click.echo('Got config: %s' % spec)
 
     # Create a directory to work under and specify our log file.
     if not working_dir:
@@ -244,16 +243,28 @@ def runner(specfile, cleanup_working_dir, foreground, working_dir=None):
 
     with context:
         # Add our spec as an APP_SETTINGS_JSON now that we are daemonized.
-        os.environ['APP_SETTINGS_JSON'] = specfile.name
+        config_filename = os.path.abspath('./specfile.json')
+        with open(config_filename, 'w+') as fh:
+            json.dump(spec, fh)
+
+        os.environ['APP_SETTINGS_JSON'] = config_filename
 
         with ErrorHandler(spec, logfile_name):
             print('Setting up')
             worker.setup()
             print('Starting')
-            worker.start()
+            try:
+                worker.start()
+            except:
+                import traceback
+                traceback.print_exc()
+
+                raise
             print('Finishing')
             worker.finish()
 
-        if cleanup_working_dir:
-            click.echo('Cleaning up the working directory: %s' % working_dir)
-            shutil.rmtree(working_dir)
+            if no_cleanup:
+                click.echo('Not cleaning up %s' % working_dir)
+            else:
+                click.echo('Cleaning up the working directory: %s' % working_dir)
+                shutil.rmtree(working_dir)
