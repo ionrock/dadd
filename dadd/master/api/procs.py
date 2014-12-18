@@ -1,10 +1,10 @@
-import json
-
 from flask import jsonify, request, make_response
+from werkzeug.exceptions import HTTPException
 
 from dadd.master import app
-from dadd.master.utils import get_session, find_host
 from dadd.master.models import db, Process, Logfile
+
+from sqlalchemy import desc
 
 
 def set_proc_state(id, state):
@@ -56,37 +56,24 @@ def proc_logfile(id):
 @app.route('/api/procs/', methods=['POST'])
 def proc_create():
     doc = request.json
+    if not doc:
+        raise HTTPException('A specification doc must be provided', status_code=400)
 
-    # Find a host
-    host = find_host()
+    proc = Process.create(doc)
+    if not proc:
+        resp = jsonify({'message': 'Error creating process'})
+        resp.status_code = 404
+        return resp
 
-    # Create our process in the DB
-    proc = Process(spec=doc, host=host)
-    db.session.add(proc)
-    db.session.commit()
-
-    # Add the ID to the spec
-    doc['process_id'] = proc.id
-
-    # Try creating the process via the host
-    url = 'http://%s/run/' % str(host)
-    sess = get_session()
-    print('Creating app on host: %s' % url)
-    resp = sess.post(url, data=json.dumps(doc))
-    resp.raise_for_status()
-
-    # Save the pid
-    result = resp.json()
-    proc.pid = result['pid']
-    db.session.add(proc)
-    db.session.commit()
-
-    return jsonify({'created': proc.id})
+    return jsonify({'message': {
+        'success': True,
+        'process': '/api/procs/%s' % proc.id
+    }})
 
 
 @app.route('/api/procs/', methods=['GET'])
 def proc_list():
-    procs = Process.query.all()
+    procs = Process.query.order_by(desc(Process.start_time)).all()
     doc = {
         'procs': [],
         'next': None,

@@ -1,6 +1,11 @@
+import json
+
 from datetime import datetime
 
+import requests
+
 from dadd.master import app
+from dadd.master.utils import get_session
 
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import JSON
@@ -47,6 +52,48 @@ class Process(db.Model):
             'update_state_uri': '/api/procs/%s/<state>/' % self.id
         }
 
+    @classmethod
+    def create(cls, spec):
+        """
+        Create a new process on a host.
+
+        This will keep trying to start the process on a host until
+        there are no hosts left to try. The Host.find_available SHOULD
+        remove bad hosts that have shutdown or died so that this
+        doesn't loop forever.
+        """
+        try:
+            host = Host.find_available()
+        except Exception as e:
+            app.logger.error(e.message)
+            return None
+
+        # Create our process in the DB
+        proc = cls(spec=spec, host=host)
+        db.session.add(proc)
+        db.session.commit()
+
+        # Add the ID to the spec
+        spec['process_id'] = proc.id
+
+        try:
+            sess = get_session()
+            # Try creating the process via the host
+            url = 'http://%s/run/' % str(host)
+            app.logger.debug('Creating app on host: %s' % url)
+            resp = sess.post(url, data=json.dumps(spec))
+            resp.raise_for_status()
+            # Save the pid
+            result = resp.json()
+        except requests.exceptions.HTTPError:
+            return cls.create(spec)
+
+        proc.pid = result['pid']
+        db.session.add(proc)
+        db.session.commit()
+
+        return proc
+
 
 class Host(db.Model):
     __tablename__ = 'hosts'
@@ -67,6 +114,36 @@ class Host(db.Model):
             'host': self.host,
             'port': self.port
         }
+
+    @classmethod
+    def find_available(cls):
+        procs = 0
+        current_host = None
+        for host in db.session.query(cls).all():
+            if not current_host:
+                current_host = host
+
+            num_procs = len(host.procs)
+
+            # If we have a host without any proces we'll use that right
+            # off the back.
+            if num_procs == 0:
+                break
+
+            if num_procs >= procs:
+                current_host = host
+
+        if not current_host:
+            raise Exception('No workers available!')
+
+        # See if the host is up and running. If not let's delete it.
+        try:
+            requests.get('http://%s/up/' % str(current_host))
+            return current_host
+        except requests.exceptions.ConnectionError:
+            db.session.delete(host)
+            db.session.commit()
+            return cls.find_available()
 
 
 class Logfile(db.Model):
