@@ -91,6 +91,14 @@ class TestPythonWorkerProcess(object):
     @patch('dadd.worker.proc.Popen')
     def test_run_successfully(self, Popen):
         self.proc.start()
-
         Popen.assert_called_with(['ls', '-la'])
         assert self.proc.proc.wait.called
+
+    @patch('dadd.worker.proc.WorkerProcess')
+    @patch('dadd.worker.proc.os')
+    def test_update_path_with_virtualenv(self, osmod, wp):
+        osmod.environ = {'PATH': '/usr/local/bin'}
+        self.proc.start()
+        path_dirs = osmod.environ['PATH'].split(':')
+        assert len(path_dirs) == 2
+        osmod.path.abspath.assert_called_with('./venv/bin/')
