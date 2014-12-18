@@ -47,8 +47,7 @@ class ChildProcess(object):
 
         cmd = [
             'dadd', 'run', env.spec,
-            '--working-dir', env.directory,
-            '--cleanup-working-dir'
+            '--working-dir', env.directory
         ]
 
         if foreground:
@@ -133,7 +132,7 @@ class PythonWorkerProcess(WorkerProcess):
 
     def start(self):
         # Add our virtualenv to the path
-        os.environ['PATH'] += ';%s' % os.path.abspath('./venv/bin/')
+        os.environ['PATH'] += ':%s' % os.path.abspath('./venv/bin/')
         super(PythonWorkerProcess, self).start()
 
     @property
