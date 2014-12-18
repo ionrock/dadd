@@ -3,9 +3,12 @@ import json
 import random
 
 import yaml
+import pytest
 
 from dadd.master import app
 from dadd.master.models import Process, Host, db
+
+from werkzeug.exceptions import HTTPException
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -72,6 +75,10 @@ class TestMasterProcAPI(object):
         db.session.add(proc)
         db.session.commit()
         return proc.id
+
+    def test_add_proc_no_hosts(self):
+        resp = self.app.post('/api/procs/')
+        assert resp.status_code == 400
 
     def test_proc_set_state(self):
         proc_id = self.add_proc()

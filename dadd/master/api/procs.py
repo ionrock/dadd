@@ -1,5 +1,4 @@
 from flask import jsonify, request, make_response
-from werkzeug.exceptions import HTTPException
 
 from dadd.master import app
 from dadd.master.models import db, Process, Logfile
@@ -57,7 +56,9 @@ def proc_logfile(id):
 def proc_create():
     doc = request.json
     if not doc:
-        raise HTTPException('A specification doc must be provided', status_code=400)
+        resp = jsonify({'message': 'A specification doc must be provided'})
+        resp.status_code = 400
+        return resp
 
     proc = Process.create(doc)
     if not proc:
