@@ -1,2 +1,2 @@
-master: PYTHONUNBUFFERED=true venv/bin/dadd --debug master
-worker: PYTHONUNBUFFERED=true venv/bin/dadd --debug worker
+master: dadd --debug -p $PORT master
+worker: dadd --debug -p $PORT worker
