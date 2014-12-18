@@ -16,6 +16,7 @@ requirements = [
     'python-daemon',
     'click',
     'flask-sqlalchemy',
+    'flask-admin',
     'psycopg2',
     'cherrypy',
     'erroremail',

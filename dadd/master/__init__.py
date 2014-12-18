@@ -4,6 +4,7 @@ import yaml
 import click
 
 from flask import Flask
+from flask.ext.admin import Admin
 
 from dadd import server
 
@@ -16,6 +17,7 @@ app.config.from_object('dadd.master.settings')
 import dadd.master.handlers  # noqa
 import dadd.master.api.procs  # noqa
 import dadd.master.api.hosts  # noqa
+from dadd.master.admin import admin
 
 
 @click.command(name='master')
@@ -31,5 +33,6 @@ def run(ctx):
         config = yaml.safe_load(open(os.environ['APP_SETTINGS_YAML']))
         app.config.update(config)
 
+    admin(app)
     server.mount(app, '/')
     server.run(app.config)
