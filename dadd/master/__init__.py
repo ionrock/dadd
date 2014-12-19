@@ -1,12 +1,9 @@
-import os
-
-import yaml
 import click
 
 from flask import Flask
-from flask.ext.admin import Admin
 
 from dadd import server
+from dadd.master.utils import update_config
 
 
 # Set up the app object before importing the handlers to avoid a
@@ -26,13 +23,7 @@ def run(ctx):
     if ctx.obj:
         app.config.update(ctx.obj)
 
-    if 'DEBUG' in os.environ:
-        app.debug = True
-
-    if os.environ.get('APP_SETTINGS_YAML'):
-        config = yaml.safe_load(open(os.environ['APP_SETTINGS_YAML']))
-        app.config.update(config)
-
+    update_config(app)
     admin(app)
     server.mount(app, '/')
     server.run(app.config)
