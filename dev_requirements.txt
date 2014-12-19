@@ -8,3 +8,6 @@ honcho
 portend
 webtest
 bumpversion
+
+Flask-Script
+Flask-Migrate

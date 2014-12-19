@@ -46,6 +46,7 @@ setup(
     entry_points={
         'console_scripts': [
             'dadd = dadd.cli:main',
+            'dadd-admin = dadd.admin:manage',
         ]
     },
     classifiers=[
