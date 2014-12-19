@@ -1,13 +1,6 @@
 -e .
 
-requests
 pytest
 mock
-PyYAML
 honcho
-portend
-webtest
 bumpversion
-
-Flask-Script
-Flask-Migrate

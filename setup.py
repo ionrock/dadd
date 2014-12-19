@@ -12,15 +12,17 @@ readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 requirements = [
-    'flask',
+    'Flask',
+    'Flask-SQLAlchemy',
+    'Flask-Admin',
+    'Flask-Script',
+    'Flask-Migrate',
     'python-daemon',
     'click',
-    'flask-sqlalchemy',
-    'flask-admin',
     'psycopg2',
     'cherrypy',
     'erroremail',
-    'pyyaml',
+    'PyYAML',
     'requests',
 ]
 
