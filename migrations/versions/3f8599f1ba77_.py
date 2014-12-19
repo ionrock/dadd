@@ -1,14 +1,14 @@
-"""empty message
+"""Initial database.
 
 Revision ID: 3f8599f1ba77
-Revises: 1d35d7751694
+Revises: None
 Create Date: 2014-12-18 21:47:50.840534
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '3f8599f1ba77'
-down_revision = '1d35d7751694'
+down_revision = None
 
 from alembic import op
 import sqlalchemy as sa
@@ -27,7 +27,7 @@ def upgrade():
         'hosts',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('host', sa.String(), nullable=False),
-        sa.Column('print()ort', sa.Integer(), nullable=False),
+        sa.Column('port', sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('host', 'port')
     )
