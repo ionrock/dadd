@@ -20,7 +20,7 @@ Here is what dadd does:
 That is it!
 
 Why Dadd?
-========
+=========
 
 Many distributed computing platforms rely on each worker being
 released with the code that will be run by the worker. `Celery
@@ -77,13 +77,13 @@ installing any Python dependencies.
 
 
 Dadd Processes
-=============
+==============
 
 Dadd comes with a command line tool that starts the different dadd
 processes.
 
 Dadd Master
-----------
+-----------
 
 Running `dadd master` will start the master server. This maintains the
 list of processes and hosts. When you try to start a process it will
@@ -92,7 +92,7 @@ from the lists of hosts.
 
 
 Dadd Worker
-----------
+-----------
 
 Run `dadd worker` starts up a worker process. The if a master is
 defined in the config or environment it will register itself so that
@@ -102,7 +102,7 @@ with the master.
 
 
 Dadd Runner
-----------
+-----------
 
 The `dadd run` command runs a process as a deamon and does the build
 process prior to running the command. If the master is specified in
@@ -111,5 +111,5 @@ notify the master of its state as well as upload its log on failure.
 
 
 * Free software: BSD license
-..
-   * Documentation: https://dadd.readthedocs.org.
+
+.. * Documentation: https://dadd.readthedocs.org.
