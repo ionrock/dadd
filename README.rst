@@ -1,6 +1,6 @@
-===
+====
 Dadd
-===
+====
 
 Dadd administers daemons!
 
@@ -35,7 +35,7 @@ on the host other than having python installed and virtualenv. When a
 process is started files can be downloaded and Python dependencies
 installed in order to run some code.
 
-Dadd is not meant to automatically scale a systems or provide stats on
+Dadd is not meant to automatically scale a system or provide stats on
 processes. It is meant to *run* a process as a daemon. It is the
 responsibility of the process to integrate with other systems. Dadd
 expects the process to exit on its own.
@@ -52,9 +52,13 @@ defines a couple keys. Here is an example: ::
     "download_urls": [
       "https://s3.com/mybucket/some_data.json",
     ],
+    "config": {
+      "db": "postgres://username:pw@dbhost:5432/mydb",
+    },
     "python_deps": [
       "mypackage"
-    ]
+    ],
+    "python_cheeseshop": "http://cheese.mydomain.net"
   }
 
 When you want to run a process, you POST the spec to the dadd master
@@ -62,6 +66,14 @@ server. It will find a host to run it on and send it along to the
 worker. The worker will then set up a temp directory and allow a `dadd
 run` process download any files, install a virtualenv along with the
 `python_deps` and run the command.
+
+Any configuration provided in the spec will be written to the
+temporary directory as JSON. The filename will be available to the
+process in the environment via the `APP_SETTINGS_JSON` env var.
+
+If you need to install packages from a specific cheese shop, you can
+provide a `python_cheeseshop` in the spec and it will be used when
+installing any Python dependencies.
 
 
 Dadd Processes
