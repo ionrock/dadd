@@ -28,7 +28,7 @@ requirements = [
 
 setup(
     name='dadd',
-    version='0.1.11',
+    version='0.1.12',
     description='Dadd administers daemons.',
     long_description=readme + '\n\n' + history,
     author='Eric Larson',
