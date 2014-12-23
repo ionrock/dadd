@@ -1,4 +1,5 @@
 import json
+import socket
 
 import requests
 
@@ -31,7 +32,7 @@ def register(host, port):
     try:
         url = app.config['MASTER_URL'] + '/api/hosts/'
         resp = sess.post(url, data=json.dumps({
-            'host': host, 'port': port
+            'host': socket.getfqdn(), 'port': port
         }))
         if not resp.ok:
             app.logger.warning('Error registering with master: %s' %
