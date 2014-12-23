@@ -16,6 +16,9 @@ import requests
 from erroremail import ErrorEmail
 
 from dadd.worker import app
+from dadd.master.utils import update_config
+
+from pprint import pprint
 
 
 ProcessEnv = namedtuple('ProcessEnv', [
@@ -65,7 +68,27 @@ class ChildProcess(object):
         return self._info
 
 
-class WorkerProcess(object):
+class ClientMixin(object):
+    """Assuming we have an object with a spec, we provide some methods
+    to talk to the master.
+
+    Note: This should eventually be removed for an actual dadd.client"""
+
+    def procs_url(self, tail):
+        base = os.environ.get('MASTER_URL', app.config['MASTER_URL'])
+        return '%s/api/procs/%s/%s' % (base, self.spec.get('process_id'), tail)
+
+    def set_process_state(self, state):
+        if 'process_id' in self.spec:
+            resp = self.sess.post(self.procs_url('%s/' % state))
+            if not resp.ok:
+                print(resp.request.url)
+                pprint(dict(resp.headers))
+                print(resp.content)
+                resp.raise_for_status()
+
+
+class WorkerProcess(ClientMixin):
 
     def __init__(self, spec, sess=None):
         self.spec = spec
@@ -99,6 +122,17 @@ class WorkerProcess(object):
             with open(filename, 'w+') as fh:
                 for chunk in resp:
                     fh.write(chunk)
+
+    def finish(self):
+        self.set_process_state('success')
+
+    def cleanup(self, *args):
+        print('Cleaning up: %s' % list(args))
+        self.proc.terminate()
+
+    @property
+    def code(self):
+        return self.proc.returncode
 
 
 class PythonWorkerProcess(WorkerProcess):
@@ -135,27 +169,19 @@ class PythonWorkerProcess(WorkerProcess):
         os.environ['PATH'] += ':%s' % os.path.abspath('./venv/bin/')
         super(PythonWorkerProcess, self).start()
 
-    @property
-    def code(self):
-        return self.proc.returncode
 
-    def cleanup(self, *args):
-        print('Cleaning up: %s' % list(args))
-        self.proc.terminate()
-
-    def finish(self):
-        print('notifying master...')
-
-
-class ErrorHandler(object):
+class ErrorHandler(ClientMixin):
     def __init__(self, spec, logfile):
         self.spec = spec
         self.logfile = logfile
         self.sess = requests.Session()
+        self.base_url = app.config['MASTER_URL']
+        print('masterurl: %s' % self.base_url)
 
     def procs_url(self, tail):
-        base = app.config['MASTER_URL']
-        return '%s/api/procs/%s/%s' % (base, self.spec.get('process_id'), tail)
+        return '%s/api/procs/%s/%s' % (
+            self.base_url, self.spec.get('process_id'), tail
+        )
 
     def upload_log(self):
         if 'process_id' in self.spec:
@@ -163,14 +189,6 @@ class ErrorHandler(object):
             url = self.procs_url('logfile/')
             headers = {'content-type': 'text/plain'}
             self.sess.post(url, headers=headers, data=logfile)
-
-    def set_process_state(self, state):
-        if 'process_id' in self.spec:
-            try:
-                self.sess.post(self.procs_url('%s/' % state))
-            except requests.exceptions.ConnectionError:
-                # TODO: Display a warning.
-                pass
 
     def send_error_email(self, *args):
         if 'ERROR_EMAIL_CONFIG' in app.config:
@@ -198,6 +216,9 @@ class ErrorHandler(object):
 @click.option('--foreground', is_flag=True)
 @click.option('--working-dir', '-w')
 def runner(specfile, no_cleanup, foreground, working_dir=None):
+    # Make sure our config is up to date with our parent
+    update_config(app)
+
     # Load our spec file
     spec = json.load(specfile)
 
@@ -240,6 +261,8 @@ def runner(specfile, no_cleanup, foreground, working_dir=None):
         signal.SIGTERM: worker.cleanup,
     })
 
+    error_handler = ErrorHandler(spec, logfile_name)
+
     with context:
         # Add our spec as an APP_SETTINGS_JSON now that we are daemonized.
         config_filename = os.path.abspath('./specfile.json')
@@ -248,7 +271,7 @@ def runner(specfile, no_cleanup, foreground, working_dir=None):
 
         os.environ['APP_SETTINGS_JSON'] = config_filename
 
-        with ErrorHandler(spec, logfile_name):
+        with error_handler:
             print('Setting up')
             worker.setup()
             print('Starting')
