@@ -1,9 +1,10 @@
+import os
 import json
 import socket
 
 import requests
 
-from flask import request, jsonify
+from flask import request, jsonify, Response, abort
 
 from dadd.worker import app
 from dadd.worker.proc import ChildProcess
@@ -32,10 +33,18 @@ def register(host, port):
     try:
         url = app.config['MASTER_URL'] + '/api/hosts/'
         resp = sess.post(url, data=json.dumps({
-            'host': socket.getfqdn(), 'port': port
+            'host': app.config.get('HOSTNAME', socket.getfqdn()),
+            'port': port
         }))
         if not resp.ok:
             app.logger.warning('Error registering with master: %s' %
                                app.config['MASTER_URL'])
     except Exception as e:
         app.logger.warning('Connection Error: %s' % e)
+
+
+@app.route('/logs/<path>', methods=['GET'])
+def tail_log(path):
+    if os.path.exists(path) and path.startswith('/tmp/'):
+        return Response(open(path), content_type='text/plain')
+    abort(404)
