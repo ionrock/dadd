@@ -24,6 +24,7 @@ requirements = [
     'erroremail',
     'PyYAML',
     'requests',
+    'wsgi-request-logger',
 ]
 
 setup(
