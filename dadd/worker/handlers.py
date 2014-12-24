@@ -19,7 +19,7 @@ def run_process():
 
 @app.route('/register/', methods=['POST'])
 def register_with_master():
-    register(app)
+    register(app.config['HOST'], app.config['PORT'])
     return jsonify({'message': 'ok'})
 
 
@@ -43,8 +43,9 @@ def register(host, port):
         app.logger.warning('Connection Error: %s' % e)
 
 
-@app.route('/logs/<path>', methods=['GET'])
+@app.route('/logs/<path:path>', methods=['GET'])
 def tail_log(path):
+    path = '/' + path
     if os.path.exists(path) and path.startswith('/tmp/'):
         return Response(open(path), content_type='text/plain')
     abort(404)
