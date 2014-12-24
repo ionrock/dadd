@@ -6,7 +6,7 @@ from dadd.master.files import FileStorage
 
 @app.route('/')
 def index():
-    return redirect(url_for('static', filename='index.html'))
+    return redirect(url_for('admin.index'))
 
 
 @app.route('/files/<path>', methods=['PUT', 'GET'])
