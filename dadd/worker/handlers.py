@@ -8,13 +8,17 @@ from flask import request, jsonify, Response, abort
 
 from dadd.worker import app
 from dadd.worker.proc import ChildProcess
+from dadd.worker.logging import LogWatcher
 
 
 @app.route('/run/', methods=['POST'])
 def run_process():
     proc = ChildProcess(request.json)
     proc.run()
-    return jsonify(proc.info())
+    info = proc.info()
+    watcher = LogWatcher(os.path.join(info['directory'], 'output.log'))
+    watcher.start()
+    return jsonify(info)
 
 
 @app.route('/register/', methods=['POST'])
