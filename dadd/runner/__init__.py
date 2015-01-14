@@ -19,6 +19,7 @@ from dadd.runner.logger import get_logger
 
 def printf(msg, fh):
     fh.write(msg + '\n')
+    fh.flush()
 
 
 @contextmanager
