@@ -1,4 +1,4 @@
-from flask import jsonify, request, make_response
+from flask import jsonify, request, make_response, abort
 
 from dadd.master import app
 from dadd.master.models import db, Process, Logfile
@@ -6,8 +6,10 @@ from dadd.master.models import db, Process, Logfile
 from sqlalchemy import desc
 
 
-def set_proc_state(id, state):
-    proc = Process.query.get(id)
+def set_proc_state(pid, state):
+    proc = Process.query.get(pid)
+    if not proc:
+        abort('No Process %s' % pid)
     proc.state = state
     db.session.add(proc)
     db.session.commit()
