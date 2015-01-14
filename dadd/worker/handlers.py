@@ -1,4 +1,3 @@
-import os
 import json
 import socket
 
@@ -20,11 +19,11 @@ def run_process():
 
 @app.route('/register/', methods=['POST'])
 def register_with_master():
-    register(app.config['HOST'], app.config['PORT'])
+    register(app.config.get('HOSTNAME'), app.config['PORT'])
     return jsonify({'message': 'ok'})
 
 
-def register(host, port):
+def register(port, hostname=None):
     sess = requests.Session()
 
     if 'USERNAME' in app.config and 'PASSWORD' in app.config:
@@ -34,7 +33,7 @@ def register(host, port):
     try:
         url = app.config['MASTER_URL'] + '/api/hosts/'
         resp = sess.post(url, data=json.dumps({
-            'host': app.config.get('HOSTNAME', socket.getfqdn()),
+            'host': hostname or socket.getfqdn(),
             'port': port
         }))
         if not resp.ok:
