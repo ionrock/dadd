@@ -13,6 +13,12 @@ def get_session():
 
 
 def update_config(app):
+    if 'HOST' in os.environ:
+        app.config['HOST'] = os.environ['HOST']
+
+    if 'PORT' in os.environ:
+        app.config['PORT'] = os.environ['PORT']
+
     if 'DEBUG' in os.environ:
         app.debug = True
 
