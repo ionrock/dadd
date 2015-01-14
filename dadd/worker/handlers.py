@@ -4,20 +4,17 @@ import socket
 
 import requests
 
-from flask import request, jsonify, Response, abort
+from flask import request, jsonify
 
 from dadd.worker import app
-from dadd.worker.proc import ChildProcess
+from dadd.worker import child_process
 from dadd.worker.logging import LogWatcher
 
 
 @app.route('/run/', methods=['POST'])
 def run_process():
-    proc = ChildProcess(request.json)
-    proc.run()
-    info = proc.info()
-    watcher = LogWatcher(os.path.join(info['directory'], 'output.log'))
-    watcher.start()
+    info = child_process.start(request.json)
+    app.logger.info('Starting: %s' % info)
     return jsonify(info)
 
 
@@ -47,9 +44,13 @@ def register(host, port):
         app.logger.warning('Connection Error: %s' % e)
 
 
-@app.route('/logs/<path:path>', methods=['GET'])
+@app.route('/logs/<path:path>', methods=['POST'])
 def tail_log(path):
-    path = '/' + path
-    if os.path.exists(path) and path.startswith('/tmp/'):
-        return Response(open(path), content_type='text/plain')
-    abort(404)
+    """Tell our worker about our pid to update the master and start a
+    thread to watch the logs."""
+    if not path.startswith('/'):
+        path = '/' + path
+    app.logger.info('Logging %s' % path)
+    watcher = LogWatcher(path)
+    watcher.start()
+    return jsonify({'messsage': 'Added %s to the logs' % path})

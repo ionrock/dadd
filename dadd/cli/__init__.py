@@ -2,7 +2,7 @@ import click
 
 from dadd.master import run as run_master
 from dadd.worker import run as run_worker
-from dadd.worker.proc import runner
+from dadd.runner import runner
 
 
 @click.group()
