@@ -91,6 +91,12 @@ def configure_environ(spec):
     os.environ['APP_SETTINGS_JSON'] = config_filename
 
 
+def run_in_foreground(foreground):
+    if app.config.get('RUNNER_FOREGROUND'):
+        return True
+    return foreground
+
+
 @click.command()
 @click.argument('specfile', type=click.File())
 @click.option('--no-cleanup', is_flag=True, default=False)
@@ -107,22 +113,22 @@ def runner(specfile, no_cleanup, foreground, working_dir=None):
 
     env = find_env(spec, working_dir)
 
-    if not foreground:
-        daemon_context = daemon.DaemonContext(
+    if run_in_foreground(foreground):
+        app.logger.info('Running in the foreground')
+        run_context = foreground_context()
+    else:
+        run_context = daemon.DaemonContext(
             detach_process=True,
             working_directory=working_dir
         )
 
-        # Make sure we give our worker a chance to do clean up and notify
-        # the master on any errors.
-        # daemon_context.signal_map.update({
+        # TODO: Make sure we give our worker a chance to do clean up
+        #       and notify the master on any errors.
+        # run_context.signal_map.update({
         #     signal.SIGTERM: worker.cleanup,
         # })
-    else:
-        app.logger.info('Running in the foreground')
-        daemon_context = foreground_context()
 
-    with daemon_context:
+    with run_context:
 
         with ErrorHandler(spec, env.logfile) as error_handler:
             configure_environ(spec)
