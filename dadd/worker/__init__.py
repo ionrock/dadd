@@ -23,7 +23,7 @@ def run(ctx):
     update_config(app)
 
     register = partial(dadd.worker.handlers.register,
-                       app.config['HOST'],
+                       app,
                        app.config['PORT'])
 
     server.monitor('Dadd_Heartbeat', register, 2)

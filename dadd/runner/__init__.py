@@ -99,8 +99,8 @@ def run_in_foreground(foreground):
 
 @click.command()
 @click.argument('specfile', type=click.File())
-@click.option('--no-cleanup', is_flag=True, default=False)
-@click.option('--foreground', is_flag=True, default=False)
+@click.option('--no-cleanup', is_flag=True)
+@click.option('--foreground', is_flag=True)
 @click.option('--working-dir', '-w')
 def runner(specfile, no_cleanup, foreground, working_dir=None):
     # Make sure our config is up to date with our parent
@@ -113,20 +113,16 @@ def runner(specfile, no_cleanup, foreground, working_dir=None):
 
     env = find_env(spec, working_dir)
 
-    if run_in_foreground(foreground):
-        app.logger.info('Running in the foreground')
-        run_context = foreground_context()
-    else:
-        run_context = daemon.DaemonContext(
-            detach_process=True,
-            working_directory=working_dir
-        )
+    run_context = daemon.DaemonContext(
+        detach_process=run_in_foreground(foreground),
+        working_directory=working_dir
+    )
 
-        # TODO: Make sure we give our worker a chance to do clean up
-        #       and notify the master on any errors.
-        # run_context.signal_map.update({
-        #     signal.SIGTERM: worker.cleanup,
-        # })
+    # TODO: Make sure we give our worker a chance to do clean up
+    #       and notify the master on any errors.
+    # run_context.signal_map.update({
+    #     signal.SIGTERM: worker.cleanup,
+    # })
 
     with run_context:
 
