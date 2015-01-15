@@ -115,7 +115,7 @@ def runner(specfile, no_cleanup, foreground, working_dir=None):
 
     run_context = daemon.DaemonContext(
         detach_process=run_in_foreground(foreground),
-        working_directory=working_dir
+        working_directory=working_dir,
     )
 
     # TODO: Make sure we give our worker a chance to do clean up
@@ -124,12 +124,17 @@ def runner(specfile, no_cleanup, foreground, working_dir=None):
     #     signal.SIGTERM: worker.cleanup,
     # })
 
-    with run_context:
+    with ErrorHandler(spec, env.logfile) as error_handler:
+        with run_context:
+            # Write a pidfile for our handler to know what our new pid is.
+            pid = os.getpid()
+            with open('pid.txt', 'w+') as pidfile:
+                pidfile.write('%s' % pid)
 
-        with ErrorHandler(spec, env.logfile) as error_handler:
             configure_environ(spec)
-
             with open(env.logfile, 'w+') as output:
+                printf('PID: %s' % pid, output)
+
                 worker = PythonWorkerProcess(spec, output)
 
                 printf('Setting up', output)

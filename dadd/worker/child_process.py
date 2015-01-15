@@ -1,4 +1,5 @@
 import os
+import time
 import json
 import tempfile
 import subprocess
@@ -26,6 +27,21 @@ def create_env(spec):
     )
 
 
+def wait_for_path(path, timeout=5):
+    """Wait for a path to exis before exiting."""
+    app.logger.info('Waiting for %s' % path)
+    for t in range(timeout * 10):
+        if os.path.exists(path):
+            return open(path).read()
+        time.sleep(.1)
+    return Exception('File: %s does not exist' % path)
+
+
+def get_pid(env):
+    path = os.path.join(env.directory, 'pid.txt')
+    return int(wait_for_path(path))
+
+
 def start(spec, foreground=False):
     env = create_env(spec)
 
@@ -43,7 +59,7 @@ def start(spec, foreground=False):
                             stderr=subprocess.STDOUT,
                             close_fds=True)
     proc.wait()
-    pid = proc.pid
+    pid = get_pid(env)
     app.logger.info('Started: %s' % cmd)
 
     return {

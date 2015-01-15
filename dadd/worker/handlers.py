@@ -1,3 +1,5 @@
+import os
+
 from flask import request, jsonify
 
 from dadd.worker import app
@@ -10,6 +12,11 @@ from dadd.worker.utils import get_hostname, register
 def run_process():
     info = child_process.start(request.json)
     app.logger.info('Starting: %s' % info)
+    watcher = LogWatcher(
+        os.path.join(info['directory'], 'output.log'),
+        info['pid']
+    )
+    watcher.start()
     return jsonify(info)
 
 
