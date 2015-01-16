@@ -1,3 +1,5 @@
+import subprocess
+
 from functools import partial
 
 import click
@@ -31,6 +33,9 @@ def run(ctx):
     # Log the hostname:port we are registering with the master.
     app.logger.info('Registering %s:%s with master.' % (
         get_hostname(app), app.config['PORT']))
+
+    hostname = subprocess.check_output(['hostname'])
+    app.logger.info('hostname: %s' % hostname)
 
     server.monitor('Dadd_Heartbeat', register, 2)
     server.mount(app, '/')
