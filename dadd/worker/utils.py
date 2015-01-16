@@ -1,14 +1,14 @@
 import json
-import socket
+# import socket
 import subprocess
 
 import requests
 
 
 def get_hostname(app):
-    hostname = subprocess.check_output(['hostname', '-d']).strip()
+    hostname = subprocess.check_output(['hostname', '-f']).strip()
     app.logger.info('hostname: %s' % hostname)
-    return app.config.get('HOSTNAME', hostname)
+    return hostname
 
 
 def register(app, port, hostname=None):

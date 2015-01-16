@@ -1,5 +1,3 @@
-import subprocess
-
 from functools import partial
 
 import click
