@@ -62,8 +62,10 @@ def start(spec, foreground=False):
     if not foreground:
         # Wait for the process to daemonize
         proc.wait()
+        pid = get_pid(env)
+    else:
+        pid = proc.pid
 
-    pid = get_pid(env)
     app.logger.info('Started: %s' % cmd)
 
     return {
