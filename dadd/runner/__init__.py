@@ -20,8 +20,12 @@ from dadd.runner.logger import get_logger
 
 
 @contextmanager
-def foreground_context():
+def foreground_context(working_directory=None):
+    current_dir = os.path.abspath(os.getcwd())
+    if working_directory:
+        os.chdir(working_directory)
     yield
+    os.chdir(current_dir)
 
 
 class ErrorHandler(object):
@@ -104,11 +108,14 @@ def runner(specfile, no_cleanup, foreground, working_dir=None):
 
     env = find_env(spec, working_dir)
 
-    run_context = daemon.DaemonContext(
-        stderr=sys.stdout,
-        detach_process=foreground,
-        working_directory=working_dir,
-    )
+    if foreground:
+        run_context = foreground_context(working_directory=working_dir)
+    else:
+        run_context = daemon.DaemonContext(
+            stderr=sys.stdout,
+            detach_process=foreground,
+            working_directory=working_dir,
+        )
 
     # TODO: Make sure we give our worker a chance to do clean up
     #       and notify the master on any errors.
