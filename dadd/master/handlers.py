@@ -9,7 +9,7 @@ def index():
     return redirect(url_for('admin.index'))
 
 
-@app.route('/files/<path>', methods=['PUT', 'GET'])
+@app.route('/files/<path:path>', methods=['PUT', 'GET'])
 def files(path):
     storage = FileStorage(app.config['STORAGE_DIR'])
 
