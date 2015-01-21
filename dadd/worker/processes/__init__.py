@@ -22,7 +22,6 @@ class WorkerProcess(object):
 
     def log(self, msg):
         printf(msg, self.output)
-        app.logger.info(msg)
 
     def start(self):
         if isinstance(self.spec['cmd'], basestring):
