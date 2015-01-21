@@ -91,12 +91,6 @@ def configure_environ(spec):
     os.environ['APP_SETTINGS_JSON'] = config_filename
 
 
-def run_in_foreground(foreground):
-    if app.config.get('RUNNER_FOREGROUND'):
-        return True
-    return foreground
-
-
 @click.command()
 @click.argument('specfile', type=click.File())
 @click.option('--no-cleanup', is_flag=True)
@@ -114,7 +108,7 @@ def runner(specfile, no_cleanup, foreground, working_dir=None):
     env = find_env(spec, working_dir)
 
     run_context = daemon.DaemonContext(
-        detach_process=run_in_foreground(foreground),
+        detach_process=foreground,
         working_directory=working_dir,
     )
 

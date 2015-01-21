@@ -10,13 +10,17 @@ from dadd.worker.utils import get_hostname, register
 
 @app.route('/run/', methods=['POST'])
 def run_process():
-    info = child_process.start(request.json)
+    foreground = app.config.get('RUNNER_FOREGROUND', False)
+    info = child_process.start(request.json, foreground)
+
     app.logger.info('Starting: %s' % info)
-    watcher = LogWatcher(
-        os.path.join(info['directory'], 'output.log'),
-        info['pid']
-    )
-    watcher.start()
+
+    if not foreground:
+        watcher = LogWatcher(
+            os.path.join(info['directory'], 'output.log'),
+            info['pid']
+        )
+        watcher.start()
     return jsonify(info)
 
 

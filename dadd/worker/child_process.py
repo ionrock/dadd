@@ -58,7 +58,11 @@ def start(spec, foreground=False):
     proc = subprocess.Popen(cmd,
                             stderr=subprocess.STDOUT,
                             close_fds=True)
-    proc.wait()
+
+    if not foreground:
+        # Wait for the process to daemonize
+        proc.wait()
+
     pid = get_pid(env)
     app.logger.info('Started: %s' % cmd)
 
