@@ -4,12 +4,14 @@ import os
 class FileStorage(object):
 
     def __init__(self, path):
-        self.path = path
+        self.path = os.path.abspath(path)
 
-    def save(self, name, input):
+    def init(self):
         if not os.path.exists(self.path):
             os.mkdir(self.path)
 
+    def save(self, name, input):
+        self.init()
         try:
             os.makedirs(os.path.join(self.path, os.path.dirname(name)))
         except (IOError, OSError):
