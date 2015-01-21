@@ -21,7 +21,12 @@ class WorkerProcess(object):
         self.download_files()
 
     def log(self, msg):
+        print(msg)
         printf(msg, self.output)
+
+    def print_env(self):
+        call(['ls', '-la'], stderr=STDOUT, stdout=self.output)
+        call(['printenv'], stderr=STDOUT, stdout=self.output)
 
     def start(self):
         if isinstance(self.spec['cmd'], basestring):
@@ -35,14 +40,18 @@ class WorkerProcess(object):
                 part = os.environ['APP_SETTINGS_JSON']
             cmd.append(part)
 
-        self.log('Running: %s' % ' '.join(cmd))
+        # self.log('Current Environment')
+        # self.print_env()
 
+        self.log('Running: %s' % ' '.join(cmd))
         self.returncode = call(cmd, stdout=self.output, stderr=STDOUT)
 
     def download_files(self):
+        self.log('Downloading: %s' % self.spec.get('download_urls'))
         for filename, url in self.spec.get('download_urls', {}).iteritems():
             resp = self.conn.sess.get(url, stream=True)
-            resp.raise_for_status()
+            if not resp.ok:
+                resp.raise_for_status()
 
             with open(filename, 'w+') as fh:
                 for chunk in resp:
