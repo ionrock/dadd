@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import shutil
 
@@ -11,15 +12,11 @@ from erroremail import ErrorEmail
 
 from dadd import client
 from dadd.worker import app
+from dadd.worker.utils import printf
 from dadd.worker.child_process import create_env, ProcessEnv
 from dadd.worker.processes.python import PythonWorkerProcess
 from dadd.master.utils import update_config
 from dadd.runner.logger import get_logger
-
-
-def printf(msg, fh):
-    fh.write(msg + '\n')
-    fh.flush()
 
 
 @contextmanager
@@ -108,6 +105,7 @@ def runner(specfile, no_cleanup, foreground, working_dir=None):
     env = find_env(spec, working_dir)
 
     run_context = daemon.DaemonContext(
+        stderr=sys.stdout,
         detach_process=foreground,
         working_directory=working_dir,
     )

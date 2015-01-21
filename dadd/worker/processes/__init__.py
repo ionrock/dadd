@@ -4,6 +4,7 @@ import shlex
 from subprocess import call, STDOUT
 
 from dadd.worker import app
+from dadd.worker.utils import printf
 from dadd import client
 
 
@@ -20,8 +21,8 @@ class WorkerProcess(object):
         self.download_files()
 
     def log(self, msg):
-        self.output.write('%s\n' % msg)
-        self.output.flush()
+        printf(msg, self.output)
+        app.logger.info(msg)
 
     def start(self):
         if isinstance(self.spec['cmd'], basestring):

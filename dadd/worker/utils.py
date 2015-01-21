@@ -1,5 +1,4 @@
 import json
-# import socket
 import subprocess
 
 import requests
@@ -31,3 +30,8 @@ def register(app, port, hostname=None):
                                app.config['MASTER_URL'])
     except Exception as e:
         app.logger.warning('Connection Error: %s' % e)
+
+
+def printf(msg, fh):
+    fh.write(msg + '\n')
+    fh.flush()
