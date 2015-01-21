@@ -105,11 +105,11 @@ def run_in_foreground(foreground):
 def runner(specfile, no_cleanup, foreground, working_dir=None):
     # Make sure our config is up to date with our parent
     update_config(app)
-    app.logger.info('update config before daemonizing')
+    app.logger.info('Update Config.')
 
     # Load our spec file
     spec = json.load(specfile)
-    app.logger.info('loading the spec file')
+    app.logger.info('Loaded the spec file.')
 
     env = find_env(spec, working_dir)
 
