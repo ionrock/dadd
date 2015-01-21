@@ -64,7 +64,9 @@ def proc_create():
 
     proc = Process.create(doc)
     if not proc:
-        resp = jsonify({'message': 'Error creating process'})
+        resp = jsonify({
+            'message': 'Error creating process'
+        })
         resp.status_code = 404
         return resp
 
