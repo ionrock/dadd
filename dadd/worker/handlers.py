@@ -8,6 +8,11 @@ from dadd.worker.logging import LogWatcher
 from dadd.worker.utils import get_hostname, register
 
 
+@app.route('/up/', methods=['GET'])
+def worker_up():
+    return jsonify({'worker_status': 'available'})
+
+
 @app.route('/run/', methods=['POST'])
 def run_process():
     foreground = app.config.get('RUNNER_FOREGROUND', False)

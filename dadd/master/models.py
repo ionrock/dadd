@@ -84,7 +84,7 @@ class Process(db.Model):
             resp = sess.post(url, data=json.dumps(spec),
                              allow_redirects=False)
             resp.raise_for_status()
-            app.logger.debug('Worker response: %s' % resp.content)
+
             # Save the pid
             result = resp.json()
         except requests.exceptions.HTTPError:
@@ -143,9 +143,15 @@ class Host(db.Model):
 
         # See if the host is up and running. If not let's delete it.
         try:
-            requests.get('http://%s/up/' % str(current_host))
+            resp = requests.get('http://%s/up/' % str(current_host),
+                                allow_redirects=False)
+
+            # Check explicitly for a specific message in order to
+            # easily filter out hosts that might have been taken over
+            # by some other process at that port.
+            assert resp.json()['worker_status'] == 'available'
             return current_host
-        except requests.exceptions.ConnectionError:
+        except Exception:
             db.session.delete(host)
             db.session.commit()
             return cls.find_available()
