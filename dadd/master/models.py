@@ -87,6 +87,9 @@ class Process(db.Model):
             result = resp.json()
         except requests.exceptions.HTTPError:
             return cls.create(spec)
+        except requests.exceptions.ConnectionError as e:
+            app.logger.error(e)
+            return None
 
         proc.pid = result['pid']
         db.session.add(proc)
