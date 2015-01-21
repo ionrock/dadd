@@ -81,7 +81,8 @@ class Process(db.Model):
             # Try creating the process via the host
             url = 'http://%s/run/' % str(host)
             app.logger.debug('Creating app on host: %s' % url)
-            resp = sess.post(url, data=json.dumps(spec))
+            resp = sess.post(url, data=json.dumps(spec),
+                             allow_redirects=False)
             resp.raise_for_status()
             app.logger.debug('Worker response: %s' % resp.content)
             # Save the pid
