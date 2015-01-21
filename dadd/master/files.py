@@ -10,6 +10,11 @@ class FileStorage(object):
         if not os.path.exists(self.path):
             os.mkdir(self.path)
 
+        try:
+            os.makedirs(os.path.join(self.path, os.path.dirname(name)))
+        except (IOError, OSError):
+            pass
+
         filename = os.path.join(self.path, name)
         with open(filename, 'w+') as output:
             for chunk in input:
