@@ -30,7 +30,8 @@ def run(ctx):
 
     # Log the hostname:port we are registering with the master.
     app.logger.info('Registering %s:%s with master.' % (
-        get_hostname(app), app.config['PORT']))
+        get_hostname(app), app.config['PORT'])
+    )
 
     server.monitor('Dadd_Heartbeat', register, 2)
     server.mount(app, '/')
