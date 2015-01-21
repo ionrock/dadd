@@ -7,7 +7,7 @@ from dadd.runner import runner
 
 @click.group()
 @click.option('--debug', is_flag=True, default=False)
-@click.option('--host', '-H', default='127.0.0.1')
+@click.option('--host', '-H', default='0.0.0.0')
 @click.option('--port', '-p', default=5000)
 @click.pass_context
 def main(ctx, debug, host, port):
