@@ -1,4 +1,6 @@
-from flask import send_file, request, redirect, url_for
+import os
+
+from flask import send_file, request, redirect, url_for, jsonify
 
 from dadd.master import app
 from dadd.master.files import FileStorage
@@ -20,3 +22,10 @@ def files(path):
         return resp
 
     return send_file(storage.read(path))
+
+
+@app.route('/files/', methods=['GET'])
+def file_listing():
+    return jsonify({
+        'files': os.listdir(app.config['STORAGE_DIR'])
+    })
