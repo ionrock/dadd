@@ -21,7 +21,7 @@ requirements = [
     'click',
     'psycopg2',
     'cherrypy',
-    'erroremail>=0.1.3',
+    'erroremail>=0.1.4',
     'PyYAML',
     'requests',
     'wsgi-request-logger',
