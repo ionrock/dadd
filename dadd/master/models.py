@@ -83,6 +83,7 @@ class Process(db.Model):
             app.logger.debug('Creating app on host: %s' % url)
             resp = sess.post(url, data=json.dumps(spec))
             resp.raise_for_status()
+            app.logger.debug('Worker response: %s' % resp.content)
             # Save the pid
             result = resp.json()
         except requests.exceptions.HTTPError:
