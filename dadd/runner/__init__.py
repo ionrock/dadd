@@ -143,13 +143,13 @@ def runner(specfile, no_cleanup, foreground, working_dir=None):
                     worker.start()
                 except:
                     import traceback
-                    printf(traceback.format_exc())
+                    printf(traceback.format_exc(), output)
                     error_handler.upload_log()
                     raise
 
                 printf('Finishing', output)
                 worker.finish()
-                printf('Done')
+                printf('Done', output)
 
         # NOTE: These log messages essentiall fall into the ether b/c
         #       we are daemonized had to close our log file before
