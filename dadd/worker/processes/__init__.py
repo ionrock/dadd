@@ -17,8 +17,18 @@ class WorkerProcess(object):
         self.output = output
         self.returncode = None
 
-    def setup(self):
-        self.download_files()
+    def download_files(self):
+        self.log('Downloading: %s' % self.spec.get('download_urls'))
+        for filename, url in self.spec.get('download_urls', {}).iteritems():
+            resp = self.conn.sess.get(url, stream=True)
+            if not resp.ok:
+                resp.raise_for_status()
+
+            with open(filename, 'w+') as fh:
+                for chunk in resp:
+                    fh.write(chunk)
+
+            self.log('Downloaded: %s to %s' % (url, filename))
 
     def log(self, msg):
         print(msg)
@@ -27,6 +37,9 @@ class WorkerProcess(object):
     def print_env(self):
         call_cmd('ls -la', self.output)
         call_cmd('printenv', self.output)
+
+    def setup(self):
+        self.download_files()
 
     def start(self):
         if isinstance(self.spec['cmd'], basestring):
@@ -45,19 +58,6 @@ class WorkerProcess(object):
 
         self.log('Running: %s' % ' '.join(cmd))
         self.returncode = call_cmd(cmd, self.output)
-
-    def download_files(self):
-        self.log('Downloading: %s' % self.spec.get('download_urls'))
-        for filename, url in self.spec.get('download_urls', {}).iteritems():
-            resp = self.conn.sess.get(url, stream=True)
-            if not resp.ok:
-                resp.raise_for_status()
-
-            with open(filename, 'w+') as fh:
-                for chunk in resp:
-                    fh.write(chunk)
-
-            self.log('Downloaded: %s to %s' % (url, filename))
 
     def finish(self):
         state = 'success'
