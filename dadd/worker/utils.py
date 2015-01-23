@@ -43,6 +43,8 @@ def call_cmd(cmd, output):
     if isinstance(cmd, basestring):
         cmd = cmd.split()
 
+    printf('Running Cmd: %s\n' % cmd, output)
+
     return subprocess.call(cmd,
                            stdout=output,
                            stderr=subprocess.STDOUT)
