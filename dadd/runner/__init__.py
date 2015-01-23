@@ -133,6 +133,7 @@ def runner(specfile, no_cleanup, foreground, working_dir=None):
             configure_environ(spec)
             with open(env.logfile, 'w+') as output:
                 printf('PID: %s' % pid, output)
+                printf('PATH: %s' % os.environ['PATH'])
 
                 worker = PythonWorkerProcess(spec, output)
 
