@@ -63,7 +63,9 @@ class WorkerProcess(object):
         state = 'success'
         if self.returncode:
             state = 'failed'
-        client.set_process_state(self.conn, os.getpid(), state)
+        client.set_process_state(
+            self.conn, self.spec['process_id'], state
+        )
 
     @property
     def code(self):
