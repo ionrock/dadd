@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import jsonify, request, make_response, abort
 
 from dadd.master import app
@@ -12,6 +14,8 @@ def set_proc_state(pid, state):
         app.logger.error('Error settings state %s. Pid %s not found' % (state, pid))
         abort(404)
     proc.state = state
+    if state in ['failed', 'success']:
+        proc.end_time = datetime.now()
     db.session.add(proc)
     db.session.commit()
 
