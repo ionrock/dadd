@@ -166,3 +166,4 @@ class Logfile(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text)
+    added_time = db.Column(db.DateTime, default=datetime.now)
