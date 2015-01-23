@@ -9,15 +9,16 @@ from sqlalchemy import desc
 def set_proc_state(pid, state):
     proc = Process.query.get(pid)
     if not proc:
-        abort('No Process %s' % pid)
+        app.logger.error('Error settings state %s. Pid %s not found' % (state, pid))
+        abort(404)
     proc.state = state
     db.session.add(proc)
     db.session.commit()
 
 
-@app.route('/api/procs/<id>/', methods=['GET'])
-def proc_view(id):
-    proc = Process.query.get(id)
+@app.route('/api/procs/<pid>/', methods=['GET'])
+def proc_view(pid):
+    proc = Process.query.get(pid)
 
     return jsonify({
         'id': proc.id,
