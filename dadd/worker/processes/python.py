@@ -8,8 +8,7 @@ from dadd.worker.processes import WorkerProcess
 class PythonWorkerProcess(WorkerProcess):
 
     def install_virtualenv(self):
-        if not call(['pip', 'install', 'virtualenv']):
-            call(['easy_install', 'virtualenv'])
+        call(['pip', 'install', '--upgrade', 'virtualenv'])
 
     def create_virtualenv(self):
         if not call(['virtualenv', 'venv']):
