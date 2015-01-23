@@ -93,7 +93,11 @@ class Process(db.Model):
             app.logger.error(e)
             return None
 
+        # Add our process id returned from the worker and re-save our
+        # spec. Re-saving the spec ensures we passed the DB id to the
+        # worker when starting the process.
         proc.pid = result['pid']
+        proc.spec = spec
         db.session.add(proc)
         db.session.commit()
 
