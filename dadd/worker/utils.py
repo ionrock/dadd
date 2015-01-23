@@ -45,4 +45,4 @@ def call_cmd(cmd, output):
 
     return subprocess.call(cmd,
                            stdout=output,
-                           stderr=subprocess.PIPE)
+                           stderr=subprocess.STDOUT)
