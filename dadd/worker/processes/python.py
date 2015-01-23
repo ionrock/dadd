@@ -32,7 +32,13 @@ class PythonWorkerProcess(WorkerProcess):
             if self.spec.get('python_cheeseshop'):
                 cmd.extend(['-i', self.spec['python_cheeseshop']])
 
-            cmd.append(dep)
+            # a dep might be specific to a cheeseshop, so we are
+            # implicitly allowing a dependency to do something like:
+            #
+            #   `-i http://mycheese.net mypkg>=3.0`
+            #
+            # We want each arg to be passed to the comand.
+            cmd.extend(dep.split())
             self.log('Running: %s' % ' '.join(cmd))
             call_cmd(cmd, self.output)
 
