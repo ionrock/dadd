@@ -14,7 +14,7 @@ class PythonWorkerProcess(WorkerProcess):
         if not call(['virtualenv', 'venv']):
             self.install_virtualenv()
             call(['virtualenv', 'venv'])
-        os.environ['PATH'] = os.path.abspath('venv') + ':' + os.environ['PATH']
+        os.environ['PATH'] = os.path.abspath('venv/bin') + ':' + os.environ['PATH']
 
     def install_python_deps(self):
         self.create_virtualenv()
