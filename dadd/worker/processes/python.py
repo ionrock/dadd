@@ -10,11 +10,15 @@ class PythonWorkerProcess(WorkerProcess):
     def install_virtualenv(self):
         call(['pip', 'install', '--upgrade', 'virtualenv'])
 
-    def create_virtualenv(self):
-        if not call(['virtualenv', 'venv']):
+    def create_virtualenv(self, name='dadd-worker-venv'):
+
+        if not call(['virtualenv', name]):
             self.install_virtualenv()
-            call(['virtualenv', 'venv'])
-        os.environ['PATH'] = os.path.abspath('venv/bin') + ':' + os.environ['PATH']
+            call(['virtualenv', name])
+
+        venv_bin = os.path.abspath(os.path.join(name, 'bin'))
+        os.environ['PATH'] = venv_bin + ':' + os.environ['PATH']
+        self.log('Updated Path: %s' % os.environ['PATH'])
 
     def install_python_deps(self):
         self.create_virtualenv()
