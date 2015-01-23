@@ -30,15 +30,15 @@ def proc_view(pid):
     })
 
 
-@app.route('/api/procs/<id>/<state>/', methods=['POST'])
-def proc_state_init(id, state):
-    set_proc_state(id, state)
+@app.route('/api/procs/<pid>/<state>/', methods=['POST'])
+def proc_state_init(pid, state):
+    set_proc_state(pid, state)
     return jsonify({'status': state})
 
 
-@app.route('/api/procs/<id>/logfile/', methods=['GET', 'POST'])
-def proc_logfile(id):
-    proc = Process.query.get(id)
+@app.route('/api/procs/<pid>/logfile/', methods=['GET', 'POST'])
+def proc_logfile(pid):
+    proc = Process.query.get(pid)
     if request.method == 'GET':
         if proc.logfile_id:
             return make_response(proc.logfile.content)
