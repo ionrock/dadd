@@ -59,14 +59,12 @@ class ErrorHandler(object):
 
     def __exit__(self, *args):
         pid = client.get_pid(self.spec)
-
-        if None in args:
-            # client.set_process_state(self.conn, pid, 'success')
-            return True
-
         self.upload_log()
-        client.set_process_state(self.conn, pid, 'failed')
-        self.send_error_email(*args)
+
+        if None not in args:
+            client.set_process_state(self.conn, pid, 'failed')
+            self.send_error_email(*args)
+
         return True
 
 
