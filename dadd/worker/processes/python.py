@@ -5,6 +5,7 @@ from dadd.worker.utils import printf, call_cmd
 
 
 class PythonWorkerProcess(WorkerProcess):
+    python_dep_dir = 'dadd-site-packages'
 
     def install_virtualenv(self):
         printf('Installing virtualenv package', self.output)
@@ -20,8 +21,15 @@ class PythonWorkerProcess(WorkerProcess):
         self.log('Updated Path: %s' % os.environ['PATH'])
         return venv_bin
 
+    def create_site_packages(self):
+        dirname = os.path.abspath(self.python_dep_dir)
+        if not os.path.isdir(dirname):
+            os.mkdir(dirname)
+        os.environ['PYTHONPATH'] = dirname
+        return dirname
+
     def install_python_deps(self):
-        venv = self.create_virtualenv()
+        dep_dir = self.create_site_packages()
 
         # Make sure we have a list
         if isinstance(self.spec['python_deps'], basestring):
@@ -32,7 +40,7 @@ class PythonWorkerProcess(WorkerProcess):
             # same process. We need to explicitly call the
             # virtualenv's pip in order to ensure the correct
             # virtualenv is used.
-            cmd = [os.path.join(venv, 'pip'), 'install']
+            cmd = ['pip', 'install', '-t', dep_dir]
 
             if self.spec.get('python_cheeseshop'):
                 cmd.extend(['-i', self.spec['python_cheeseshop']])
