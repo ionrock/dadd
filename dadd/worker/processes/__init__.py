@@ -4,7 +4,7 @@ import shlex
 from subprocess import call, STDOUT
 
 from dadd.worker import app
-from dadd.worker.utils import printf
+from dadd.worker.utils import printf, call_cmd
 from dadd import client
 
 
@@ -25,8 +25,8 @@ class WorkerProcess(object):
         printf(msg, self.output)
 
     def print_env(self):
-        call(['ls', '-la'], stderr=STDOUT, stdout=self.output)
-        call(['printenv'], stderr=STDOUT, stdout=self.output)
+        call_cmd('ls -la', self.output)
+        call_cmd('printenv', self.output)
 
     def start(self):
         if isinstance(self.spec['cmd'], basestring):
@@ -40,11 +40,11 @@ class WorkerProcess(object):
                 part = os.environ['APP_SETTINGS_JSON']
             cmd.append(part)
 
-        # self.log('Current Environment')
-        # self.print_env()
+        self.log('Current Environment')
+        self.print_env()
 
         self.log('Running: %s' % ' '.join(cmd))
-        self.returncode = call(cmd, stdout=self.output, stderr=STDOUT)
+        self.returncode = call_cmd(cmd, self.output)
 
     def download_files(self):
         self.log('Downloading: %s' % self.spec.get('download_urls'))

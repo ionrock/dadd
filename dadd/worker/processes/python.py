@@ -1,20 +1,19 @@
 import os
 
-from subprocess import call, STDOUT
-
 from dadd.worker.processes import WorkerProcess
+from dadd.worker.utils import printf, call_cmd
 
 
 class PythonWorkerProcess(WorkerProcess):
 
     def install_virtualenv(self):
-        call(['pip', 'install', '--upgrade', 'virtualenv'])
+        printf('Installing virtualenv package', self.output)
+        call_cmd('pip install --upgrade virtualenv', self.output)
 
     def create_virtualenv(self, name='dadd-worker-venv'):
-
-        if not call(['virtualenv', name]):
-            self.install_virtualenv()
-            call(['virtualenv', name])
+        self.install_virtualenv()
+        printf('Creating the virtualenv', self.output)
+        call_cmd(['virtualenv', name], self.output)
 
         venv_bin = os.path.abspath(os.path.join(name, 'bin'))
         os.environ['PATH'] = venv_bin + ':' + os.environ['PATH']
@@ -35,7 +34,7 @@ class PythonWorkerProcess(WorkerProcess):
 
             cmd.append(dep)
             self.log('Running: %s' % ' '.join(cmd))
-            call(cmd, stderr=STDOUT, stdout=self.output)
+            call_cmd(cmd, self.output)
 
     def setup(self):
         super(PythonWorkerProcess, self).setup()

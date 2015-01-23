@@ -33,5 +33,16 @@ def register(app, port, hostname=None):
 
 
 def printf(msg, fh):
+    "Print to a file handle."
     fh.write(msg + '\n')
     fh.flush()
+
+
+def call_cmd(cmd, output):
+    "Call a command sending stdout/stderr to an output file handle."
+    if isinstance(cmd, basestring):
+        cmd = cmd.split()
+
+    return subprocess.call(cmd,
+                           stdout=output,
+                           stderr=subprocess.PIPE)
