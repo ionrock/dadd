@@ -7,15 +7,18 @@ from dadd.worker.processes import WorkerProcess
 
 class PythonWorkerProcess(WorkerProcess):
 
+    def install_virtualenv(self):
+        if not call(['pip', 'install', 'virtualenv']):
+            call(['easy_install', 'virtualenv'])
+
     def create_virtualenv(self):
-        call(['virtualenv', 'venv'])
+        if not call(['virtualenv', 'venv']):
+            self.install_virtualenv()
+            call(['virtualenv', 'venv'])
         os.environ['PATH'] = os.path.abspath('venv') + ':' + os.environ['PATH']
 
     def install_python_deps(self):
-        try:
-            self.create_virtualenv()
-        except:
-            pass
+        self.create_virtualenv()
 
         # Make sure we have a list
         if isinstance(self.spec['python_deps'], basestring):
