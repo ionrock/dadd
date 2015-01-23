@@ -18,16 +18,21 @@ class PythonWorkerProcess(WorkerProcess):
         venv_bin = os.path.abspath(os.path.join(name, 'bin'))
         os.environ['PATH'] = venv_bin + ':' + os.environ['PATH']
         self.log('Updated Path: %s' % os.environ['PATH'])
+        return venv_bin
 
     def install_python_deps(self):
-        self.create_virtualenv()
+        venv = self.create_virtualenv()
 
         # Make sure we have a list
         if isinstance(self.spec['python_deps'], basestring):
             self.spec['python_deps'] = [self.spec['python_deps']]
 
         for dep in self.spec['python_deps']:
-            cmd = ['pip', 'install']
+            # We don't get an updated PATH value when calling in the
+            # same process. We need to explicitly call the
+            # virtualenv's pip in order to ensure the correct
+            # virtualenv is used.
+            cmd = [os.path.join(venv, 'pip'), 'install']
 
             if self.spec.get('python_cheeseshop'):
                 cmd.extend(['-i', self.spec['python_cheeseshop']])
