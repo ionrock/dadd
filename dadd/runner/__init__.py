@@ -149,6 +149,7 @@ def runner(specfile, no_cleanup, foreground, working_dir=None):
                 printf('Finishing', output)
                 worker.finish()
                 printf('Done', output)
+                error_handler.upload_log()
 
         # NOTE: These log messages essentiall fall into the ether b/c
         #       we are daemonized had to close our log file before

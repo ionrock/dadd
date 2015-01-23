@@ -48,6 +48,7 @@ def proc_logfile(pid):
             return make_response(proc.logfile.content)
         return 'No logfile found', 404
 
+    app.logger.info('Adding logfile for %s' % pid)
     app.logger.info(request.data)
 
     logfile = Logfile(content=request.data)
