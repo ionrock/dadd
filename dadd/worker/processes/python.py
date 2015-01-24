@@ -7,16 +7,14 @@ from dadd.worker.utils import printf, call_cmd
 class PythonWorkerProcess(WorkerProcess):
     python_dep_dir = 'dadd-pyenv'
 
-    def install_virtualenv(self):
-        printf('Installing virtualenv package', self.output)
-        call_cmd('pip install --upgrade virtualenv', self.output)
-
     def create_virtualenv(self, name='dadd-worker-venv'):
         printf('Creating the virtualenv', self.output)
-        call_cmd(['virtualenv', name], self.output)
+        if call_cmd(['virtualenv', name], self.output):
+            raise Exception('Error creating virtualenv')
 
         venv_bin = os.path.abspath(os.path.join(name, 'bin'))
         os.environ['PATH'] = venv_bin + ':' + os.environ['PATH']
+        os.environ['PYTHONHOME'] = name
         self.log('Updated Path: %s' % os.environ['PATH'])
         return venv_bin
 
