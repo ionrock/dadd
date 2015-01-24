@@ -25,6 +25,7 @@ requirements = [
     'PyYAML',
     'requests',
     'wsgi-request-logger',
+    'virtualenv',
 ]
 
 setup(
