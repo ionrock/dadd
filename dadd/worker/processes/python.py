@@ -12,7 +12,6 @@ class PythonWorkerProcess(WorkerProcess):
         call_cmd('pip install --upgrade virtualenv', self.output)
 
     def create_virtualenv(self, name='dadd-worker-venv'):
-        self.install_virtualenv()
         printf('Creating the virtualenv', self.output)
         call_cmd(['virtualenv', name], self.output)
 
@@ -28,7 +27,7 @@ class PythonWorkerProcess(WorkerProcess):
         return dirname
 
     def install_python_deps(self):
-        dep_dir = self.create_site_packages()
+        dep_dir = self.create_virtualenv()
 
         # Make sure we have a list
         if isinstance(self.spec['python_deps'], basestring):
