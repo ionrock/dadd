@@ -5,7 +5,7 @@ from dadd.worker.utils import printf, call_cmd
 
 
 class PythonWorkerProcess(WorkerProcess):
-    python_dep_dir = 'dadd-site-packages'
+    python_dep_dir = 'dadd-pyenv'
 
     def install_virtualenv(self):
         printf('Installing virtualenv package', self.output)
@@ -21,11 +21,10 @@ class PythonWorkerProcess(WorkerProcess):
         self.log('Updated Path: %s' % os.environ['PATH'])
         return venv_bin
 
-    def create_site_packages(self):
+    def create_pyenv(self):
         dirname = os.path.abspath(self.python_dep_dir)
         if not os.path.isdir(dirname):
             os.mkdir(dirname)
-        os.environ['PYTHONPATH'] = dirname
         return dirname
 
     def install_python_deps(self):
