@@ -27,7 +27,7 @@ class PythonWorkerProcess(WorkerProcess):
         return dirname
 
     def install_python_deps(self):
-        dep_dir = self.create_virtualenv()
+        venv = self.create_virtualenv()
 
         # Make sure we have a list
         if isinstance(self.spec['python_deps'], basestring):
@@ -38,7 +38,7 @@ class PythonWorkerProcess(WorkerProcess):
             # same process. We need to explicitly call the
             # virtualenv's pip in order to ensure the correct
             # virtualenv is used.
-            cmd = ['pip', 'install', '-t', dep_dir]
+            cmd = [os.path.join(venv, 'pip'), 'install']
 
             if self.spec.get('python_cheeseshop'):
                 cmd.extend(['-i', self.spec['python_cheeseshop']])
