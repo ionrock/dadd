@@ -10,12 +10,12 @@ class PythonWorkerProcess(WorkerProcess):
     def create_virtualenv(self, name='dadd-worker-venv'):
         printf('Creating the virtualenv', self.output)
         if call_cmd(['virtualenv', name], self.output):
-            raise Exception('Error creating virtualenv')
+            self.log('Error creating virtualenv')
 
         venv_bin = os.path.abspath(os.path.join(name, 'bin'))
-        os.environ['PATH'] = venv_bin + ':' + os.environ['PATH']
-        os.environ['PYTHONHOME'] = name
-        self.log('Updated Path: %s' % os.environ['PATH'])
+        # os.environ['PATH'] = venv_bin + ':' + os.environ['PATH']
+        os.environ['PYTHONUSERBASE'] = name
+        # self.log('Updated Path: %s' % os.environ['PATH'])
         return venv_bin
 
     def create_pyenv(self):
@@ -36,7 +36,7 @@ class PythonWorkerProcess(WorkerProcess):
             # same process. We need to explicitly call the
             # virtualenv's pip in order to ensure the correct
             # virtualenv is used.
-            cmd = [os.path.join(venv, 'pip'), 'install']
+            cmd = [os.path.join(venv, 'pip'), '--user', 'install']
 
             if self.spec.get('python_cheeseshop'):
                 cmd.extend(['-i', self.spec['python_cheeseshop']])
